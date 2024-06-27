@@ -33,39 +33,6 @@
 SSD1320 oled(15, 16, 12, 13);  // NRF52832 15 = CS, 16 = RES, 13 = SCLK, 11 = SDIN
 HardwareSerial* printer = &Serial;
 
-int circle_lookup[30] = {
-  1,
-  4,
-  8,
-  8,
-  12,
-  16,
-  16,
-  20,
-  24,
-  29,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1
-};
-
 void setup() {
   SPI.begin();
   Serial.begin(115200);
@@ -73,27 +40,53 @@ void setup() {
   oled.clearDisplayGS();
 }
 
-void drawCircleGS(int x0, int y0, int x, int y, int grayscale)
+void drawCircleSegmentGS(int x0, int y0, int x, int y, int parts, int grayscale)
 {
+  if (parts >= 1){
     oled.setPixelGS(x0+x, y0+y, grayscale);
-    oled.setPixelGS(x0-x, y0+y, grayscale);
-    oled.setPixelGS(x0+x, y0-y, grayscale);
-    oled.setPixelGS(x0-x, y0-y, grayscale);
+  }
+
+  if (parts >= 2){
     oled.setPixelGS(x0+y, y0+x, grayscale);
-    oled.setPixelGS(x0-y, y0+x, grayscale);
+  }
+
+  if (parts >= 3){
     oled.setPixelGS(x0+y, y0-x, grayscale);
+  }
+
+  if (parts >= 4){
+    oled.setPixelGS(x0+x, y0-y, grayscale);
+  }
+
+  if (parts >= 5){
+    oled.setPixelGS(x0-x, y0-y, grayscale);
+  }
+
+  if (parts >= 6){
     oled.setPixelGS(x0-y, y0-x, grayscale);
+  }
+
+  if (parts >= 7){
+    oled.setPixelGS(x0-y, y0+x, grayscale);
+  }
+
+  if (parts >= 8){
+    oled.setPixelGS(x0-x, y0+y, grayscale);    
+  }
 }
 
 /** \brief Draw grayscale circle with Bresenham’s algorithm.
   Draw circle with radius using 4bit grayscale color (0-15) at x,y of the screen buffer.
 */
-void radialProgress(int x0, int y0, int radius, int percent, int grayscale) {
+void radialProgress(int x0, int y0, int radius, int parts, int grayscale_background, int grayscale) {
   int d = 3 - 2 * radius;
   int x = 0;
   int y = radius;
 
-  while (x <= circle_lookup[radius]*percent) {
+  oled.drawCircleGS(x0, y0, x, y, grayscale_background);
+  drawCircleSegmentGS(x0, y0, x, y, parts, grayscale);
+
+  while (x <= y) {
     x++;
 
     if (d > 0) {
@@ -103,22 +96,29 @@ void radialProgress(int x0, int y0, int radius, int percent, int grayscale) {
     else {
       d = d + 4 * x + 6;
     }
-
-    oled.setPixelGS(x0+x, y0+y, grayscale);
+    
+    oled.drawCircleGS(x0, y0, x, y, grayscale_background);
+    drawCircleSegmentGS(x0, y0, x, y, parts, grayscale);
   }
 }
 
-void drawArc(int x0, int y0, int radius, int percent, int grayscale){
-
-}
-int start_angle = 0
-int end_angle = 1.1, r = 30;
-for(var i = start_angle; i < end_angle; i = i + 0.05)
-{
-  drawpixel(x: 50 + Math.cos(i) * r, y: 100 + Math.sin(i) * r); // center point is (x = 50, y = 100)
-}
-
 void loop() {
-  radialProgress(80,15, 30, 1, 15);
-  oled.displayGS();
+  for (int i = 0; i <= 8; i++) {
+    oled.clearDisplayGS();
+    radialProgress(80, 15, 15, i, 1, 15);
+    int x = 75;
+    if (i == 8) {
+      x = 70;
+    }
+    if (i == 0) {
+      x = 78;
+    }
+    oled.printStringGS(x,12,String(int(i*12.5)),15,0);
+    oled.displayGS();
+    delay(1000);
+    if (i == 9) {
+      i == 0;
+    }
+  }
+
 }
