@@ -190,23 +190,23 @@ void VisRing::radialProgressChart(int x0, int y0, int radius, int parts, bool sh
 void VisRing::showNotification(int number, int grayscale){
   String text = String(number);
 
-  if(number==1){
-     text += " new message";
+  if(number == 1){
+     text += " notification";
   }
   else {
-    text += " new messages";
+    text += " notifications";
   }
 
   SSD1320::printStringGS(25,10,text,grayscale,0);
 }
 
 void VisRing::showNotificationIcon(int number, int grayscale){
-  SSD1320::printStringGS(85,10,String(number),grayscale,0);
+  SSD1320::printStringGS(85,5,String(number),grayscale,1);
   drawEnvelope(60,9,grayscale);
 }
 
 void VisRing::drawHR(int hr, int grayscale, int grayscale_heart){
   String text = String(hr) + " bpm";
-  drawHeart(65, 20, grayscale_heart);
-  SSD1320::printStringGS(25,10,text,grayscale,0);
+  drawHeart(100, 20, grayscale_heart);
+  SSD1320::printStringGS(55,10,text,grayscale,0);
 }

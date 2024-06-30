@@ -22,7 +22,7 @@ void setup() {
 }
 
 void example_HearRate(){
-  int hr[] = {50, 55, 60, 60, 65, 70, 70, 90, 90, 70, 50, 50};
+  int hr[] = {50, 55, 60, 60, 65, 70, 90, 100, 90, 70, 50, 50};
 
   for (int val : hr){
     VisRing.drawHR(val, 15, 7);
@@ -173,7 +173,7 @@ void example_Pattern(){
   for (int i = 0; i < 3; i ++) {
     VisRing.drawPattern(i);
     VisRing.displayGS();
-    delay(500);
+    delay(2000);
     VisRing.clearDisplayGS();
   } 
 }
@@ -182,7 +182,7 @@ void example_Text(){
   String text = "Please remember that we are meeting with Lars today at 4 pm at the bus stop. Can you be there at 3:30?";
   VisRing.printStringGS(0,24,text,15,0);
   VisRing.displayGS();
-  delay(2000);
+  delay(3000);
   VisRing.clearDisplayGS();
 }
 
