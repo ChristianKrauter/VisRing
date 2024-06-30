@@ -6,25 +6,28 @@
 #include <SPI.h>
 #include <VisRing.h>
 
-//Initialize the display with the follow pin connections
-//Note that you should not change SCLK and MOSI because the
-//library uses hardware SPI
+// Initialize the display with the follow pin connections
+// Note that you should not change SCLK and MOSI because the
+// library uses hardware SPI
 VisRing VisRing(15, 16, 12, 13);
-HardwareSerial* printer = &Serial;
+HardwareSerial *printer = &Serial;
 
-void setup() {
+void setup()
+{
   SPI.begin();
   Serial.begin(115200);
-  VisRing.begin(160, 32, printer);  //Display is 160 wide, 32 high
+  VisRing.begin(160, 32, printer); // Display is 160 wide, 32 high
   VisRing.displayGS();
   delay(3000);
   VisRing.clearDisplayGS();
 }
 
-void example_HearRate(){
+void example_HearRate()
+{
   int hr[] = {50, 55, 60, 60, 65, 70, 90, 100, 90, 70, 50, 50};
 
-  for (int val : hr){
+  for (int val : hr)
+  {
     VisRing.drawHR(val, 15, 7);
     VisRing.displayGS();
     delay(500);
@@ -32,7 +35,8 @@ void example_HearRate(){
   }
 }
 
-void example_BarChartHor(){
+void example_BarChartHor()
+{
   int values_count = 3;
   int values[values_count] = {0, 5, 10};
   VisRing.drawBarChartHor(values, values_count, 15);
@@ -69,7 +73,8 @@ void example_BarChartHor(){
   VisRing.clearDisplayGS();
 }
 
-void example_BarChartVert(){
+void example_BarChartVert()
+{
   int values_count = 2;
   int values[values_count] = {5, 10};
   VisRing.drawBarChartVert(values, values_count, 15);
@@ -78,7 +83,7 @@ void example_BarChartVert(){
   VisRing.clearDisplayGS();
 
   int values_count_2 = 8;
-  int values_2[values_count_2] = {5,10,15,20,30,35,40,45};
+  int values_2[values_count_2] = {5, 10, 15, 20, 30, 35, 40, 45};
   VisRing.drawBarChartVert(values_2, values_count_2, 15);
   VisRing.displayGS();
   delay(500);
@@ -92,11 +97,12 @@ void example_BarChartVert(){
   VisRing.clearDisplayGS();
 }
 
-void example_BarChartVert_SmallMultiples(){
-  int values_0[7][16] = {{55, 88, 2, 5, 23, 49, 83},{39, 95, 64, 56, 11, 55, 75}};
+void example_BarChartVert_SmallMultiples()
+{
+  int values_0[7][16] = {{55, 88, 2, 5, 23, 49, 83}, {39, 95, 64, 56, 11, 55, 75}};
   int charts_count_0 = 2;
-  int values_counts_0[7] = {7,7};
-  bool focus_charts_0[7] = {true,false,false,false,false,false,false};
+  int values_counts_0[7] = {7, 7};
+  bool focus_charts_0[7] = {true, false, false, false, false, false, false};
   int value_range_min = 0;
   int value_range_max_0 = 100;
 
@@ -105,11 +111,10 @@ void example_BarChartVert_SmallMultiples(){
   delay(500);
   VisRing.clearDisplayGS();
 
-
   int values_1[7][16] = {{64, 44, 20, 67, 28, 11, 66, 26, 70, 76, 30, 22, 21, 37, 82, 36}, {72, 69, 52, 46, 29, 59, 73, 25, 48, 87, 89, 5, 43, 35, 60, 38}, {97, 24, 74, 50, 39, 88, 2, 9, 4, 15, 71, 34, 96, 27, 91, 40}, {12, 100, 99, 77, 18, 83, 19, 54, 78, 80, 92, 62, 42, 85, 93, 68}};
   int charts_count_1 = 4;
-  int values_counts_1[7] = {16,16,16,16,0,0,0};
-  bool focus_charts_1[7] = {true,true,true,true,false,false,false};
+  int values_counts_1[7] = {16, 16, 16, 16, 0, 0, 0};
+  bool focus_charts_1[7] = {true, true, true, true, false, false, false};
   int value_range_min_1 = 0;
   int value_range_max_1 = 100;
 
@@ -118,11 +123,10 @@ void example_BarChartVert_SmallMultiples(){
   delay(500);
   VisRing.clearDisplayGS();
 
-
   int values_2[7][16] = {{21, 17, 72, 81, 50}, {47, 65, 98, 51, 63}, {69, 73, 31, 92, 39}, {90, 24, 14, 10, 53}, {68, 94, 55, 100, 77}, {82, 25, 83, 27, 45}, {4, 44, 99, 59, 23}};
   int charts_count_2 = 7;
-  int values_counts_2[7] = {5,5,5,5,5,5,5};
-  bool focus_charts_2[7] = {false,false,false,true,false,false,false};
+  int values_counts_2[7] = {5, 5, 5, 5, 5, 5, 5};
+  bool focus_charts_2[7] = {false, false, false, true, false, false, false};
   int value_range_min_2 = 0;
   int value_range_max_2 = 100;
 
@@ -132,7 +136,8 @@ void example_BarChartVert_SmallMultiples(){
   VisRing.clearDisplayGS();
 }
 
-void example_lineChart(){
+void example_lineChart()
+{
   int values_count = 2;
   int values[values_count] = {0, 10};
   VisRing.lineChart(values, values_count, 3);
@@ -176,8 +181,10 @@ void example_lineChart(){
   VisRing.clearDisplayGS();
 }
 
-void example_radialProgress(){
-  for (int i = 0; i <= 8; i++) {
+void example_radialProgress()
+{
+  for (int i = 0; i <= 8; i++)
+  {
     VisRing.radialProgressChart(80, 15, 15, i, true, 1, 15, 12);
     VisRing.displayGS();
     delay(1000);
@@ -185,11 +192,13 @@ void example_radialProgress(){
   }
 }
 
-void example_Notifications(){
+void example_Notifications()
+{
   int len = 9;
   int notification_counts[] = {1, 2, 3, 4, 4, 5, 5, 5, 6};
 
-  for (int i = 0; i < len; i ++){
+  for (int i = 0; i < len; i++)
+  {
     VisRing.showNotification(notification_counts[i], 10);
     VisRing.displayGS();
     delay(1000);
@@ -197,11 +206,13 @@ void example_Notifications(){
   }
 }
 
-void example_NotificationsIcon(){
+void example_NotificationsIcon()
+{
   int len = 9;
   int notification_counts[] = {1, 2, 3, 4, 4, 5, 5, 5, 6};
 
-  for (int i = 0; i < len; i ++){
+  for (int i = 0; i < len; i++)
+  {
     VisRing.showNotificationIcon(notification_counts[i], 10);
     VisRing.displayGS();
     delay(1000);
@@ -209,24 +220,28 @@ void example_NotificationsIcon(){
   }
 }
 
-void example_Pattern(){
-  for (int i = 0; i < 3; i ++) {
+void example_Pattern()
+{
+  for (int i = 0; i < 3; i++)
+  {
     VisRing.drawPattern(i);
     VisRing.displayGS();
     delay(2000);
     VisRing.clearDisplayGS();
-  } 
+  }
 }
 
-void example_Text(){
+void example_Text()
+{
   String text = "Please remember that we are meeting with Lars today at 4 pm at the bus stop. Can you be there at 3:30?";
-  VisRing.printStringGS(0,24,text,15,0);
+  VisRing.printStringGS(0, 24, text, 15, 0);
   VisRing.displayGS();
   delay(3000);
   VisRing.clearDisplayGS();
 }
 
-void loop() {
+void loop()
+{
   example_HearRate();
   example_BarChartHor();
   example_BarChartVert();
