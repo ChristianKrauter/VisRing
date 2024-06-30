@@ -5,7 +5,6 @@
 
 #include <SPI.h>
 #include <VisRing.h>
-#include <string>
 
 //Initialize the display with the follow pin connections
 //Note that you should not change SCLK and MOSI because the
