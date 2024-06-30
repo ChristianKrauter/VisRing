@@ -16,6 +16,8 @@ void setup() {
   SPI.begin();
   Serial.begin(115200);
   VisRing.begin(160, 32, printer);  //Display is 160 wide, 32 high
+  VisRing.displayGS();
+  delay(3000);
   VisRing.clearDisplayGS();
 }
 
@@ -134,9 +136,51 @@ void example_lineChart(){
   VisRing.clearDisplayGS();
 }
 
+void example_radialProgress(){
+  for (int i = 0; i <= 8; i++) {
+    VisRing.radialProgressChart(80, 15, 15, i, true, 1, 15, 12);
+    VisRing.displayGS();
+    delay(1000);
+    VisRing.clearDisplayGS();
+  }
+}
+
+void example_Notifications(){
+  int len = 9;
+  int notification_counts[] = {1, 2, 3, 4, 4, 5, 5, 5, 6};
+
+  for (int i = 0; i < len; i ++){
+    VisRing.showNotification(notification_counts[i], 10);
+    VisRing.displayGS();
+    delay(1000);
+    VisRing.clearDisplayGS(0);
+  }
+}
+
+void example_Pattern(){
+  for (int i = 0; i < 3; i ++) {
+    VisRing.drawPattern(i);
+    VisRing.displayGS();
+    delay(500);
+    VisRing.clearDisplayGS();
+  } 
+}
+
+void example_Text(){
+  String text = "Please remember that we are meeting with Lars today at 4 pm at the bus stop. Can you be there at 3:30?";
+  VisRing.printStringGS(0,24,text,15,0);
+  VisRing.displayGS();
+  delay(2000);
+  VisRing.clearDisplayGS();
+}
+
 void loop() {
   example_HearRate();
   example_BarChartHor();
   example_BarChartVert();
   example_lineChart();
+  example_radialProgress();
+  example_Notifications();
+  example_Pattern();
+  example_Text();
 }
