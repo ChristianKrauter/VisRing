@@ -23,6 +23,16 @@ void VisRing::scaleToMinMax(int target_min, int target_max, int values[], int va
   }
 }
 
+void VisRing::scaleToMinMaxKnownRange(int target_min, int target_max, int value_range_min, int value_range_max, int values[], int values_count){
+  int values_dif = value_range_max-value_range_min;
+  int target_dif = target_max - target_min;
+  int scaled_values[] = {};
+
+  for (int i = 0; i < values_count; i++) {
+    values[i] = ((target_dif * (values[i] - value_range_min)) / (values_dif)) + target_min;
+  }
+}
+
 void VisRing::drawHeart(int x, int y, int grayscale){
   SSD1320::lineGS(x, y-2, x, y-6, grayscale);
   SSD1320::lineGS(x+1, y-1, x+1, y-7, grayscale);
@@ -97,6 +107,36 @@ void VisRing::drawBarChartVert(int values[], int values_count, int grayscale){
 
   for (int i = 0; i < values_count; i++) {
     SSD1320::rectFillGS(0, i+i*1+i*width, values[i], width, grayscale);
+  }
+}
+
+void VisRing::drawBarChartVertSmallMultiples(int values[7][16], int charts_count, int values_counts[7], bool focus_charts[7], int value_range_min, int value_range_max, int grayscale, int grayscale_focus){
+
+  int height = (SSD1320::getDisplayWidth() - ((charts_count-1)*10)) / charts_count;
+
+  for (int chart = 0; chart < charts_count; chart++)
+  {
+    if (values_counts[chart] < 2)
+    {
+      return;
+    }
+
+    scaleToMinMaxKnownRange(0, height, value_range_min, value_range_max, values[chart], values_counts[chart]);
+    
+    int width = (SSD1320::getDisplayHeight() - (values_counts[chart] - 1)) / values_counts[chart];
+
+    int gs = 0;
+    if (focus_charts[chart])
+    {
+      gs = grayscale_focus;
+    } else {
+      gs = grayscale;
+    }
+
+    for (int i = 0; i < values_counts[chart]; i++) {
+      SSD1320::lineGS(height*chart+10*chart,0,height*chart+10*chart,32,gs);
+      SSD1320::rectFillGS(height*chart+10*chart, i+i*1+i*width, values[chart][i], width, gs);
+    }
   }
 }
 
