@@ -41,6 +41,37 @@ void VisRing::drawHeart(int x, int y, int grayscale){
   SSD1320::lineGS(x+12, y-2, x+12, y-6, grayscale);
 }
 
+void VisRing::drawEnvelope(int x, int y, int grayscale){
+  SSD1320::lineGS(x, y, x, y+10, grayscale);
+  SSD1320::lineGS(x, y, x+20, y, grayscale);
+  SSD1320::lineGS(x, y+10, x+20, y+10, grayscale);
+  SSD1320::lineGS(x+20, y, x+20, y+10, grayscale);
+  SSD1320::lineGS(x, y+10, x+10, y+5, grayscale);
+  SSD1320::lineGS(x+20, y+10, x+10, y+5, grayscale);
+}
+
+void VisRing::drawPattern(int type) {
+  switch (type) {
+  case 0:
+    for (int i = 0; i <= SSD1320::getDisplayWidth() / 10; i ++) {
+      SSD1320::lineGS(i*10, 0, (i+1)*10, 30, i % 14 + 1);
+      SSD1320::lineGS((i+1)*10, 0, i*10, 30, (16-i) % 14 + 1);
+    }
+    break;
+  case 1:
+    for (int i = 0; i < SSD1320::getDisplayHeight()/2; i ++) {
+      SSD1320::lineGS(0, i, 160, i, i);
+      SSD1320::lineGS(0, i+15, 160, i+15, (16-i));
+    }
+    break;
+  case 2:
+    for (int i = 0; i < 25; i ++) {
+      SSD1320::circleGS(random(0,160), random(0,32), random(2,15), random(0,15));
+    }
+    break;
+  }
+}
+
 void VisRing::drawBarChartHor(int values[], int values_count, int grayscale){
   if (values_count > 80 | values_count < 2) {
     return;
@@ -80,6 +111,98 @@ void VisRing::lineChart(int values[], int values_count, int grayscale){
   for (int i = 0; i < values_count-1; i++) {
     SSD1320::lineGS(i*step_size, values[i], (i+1)*step_size, values[i+1], grayscale);
   }
+}
+
+void VisRing::drawCircleSegment(int x0, int y0, int x, int y, int parts, int grayscale)
+{
+  if (parts >= 1){
+    SSD1320::setPixelGS(x0+x, y0+y, grayscale);
+  }
+
+  if (parts >= 2){
+    SSD1320::setPixelGS(x0+y, y0+x, grayscale);
+  }
+
+  if (parts >= 3){
+    SSD1320::setPixelGS(x0+y, y0-x, grayscale);
+  }
+
+  if (parts >= 4){
+    SSD1320::setPixelGS(x0+x, y0-y, grayscale);
+  }
+
+  if (parts >= 5){
+    SSD1320::setPixelGS(x0-x, y0-y, grayscale);
+  }
+
+  if (parts >= 6){
+    SSD1320::setPixelGS(x0-y, y0-x, grayscale);
+  }
+
+  if (parts >= 7){
+    SSD1320::setPixelGS(x0-y, y0+x, grayscale);
+  }
+
+  if (parts >= 8){
+    SSD1320::setPixelGS(x0-x, y0+y, grayscale);
+  }
+}
+
+void VisRing::radialProgressChart(int x0, int y0, int radius, int parts, bool show_percentage, int grayscale_background, int grayscale, int grayscale_percentage) {
+  int d = 3 - 2 * radius;
+  int x = 0;
+  int y = radius;
+
+  SSD1320::drawCircleGS(x0, y0, x, y, grayscale_background);
+  drawCircleSegment(x0, y0, x, y, parts, grayscale);
+
+  while (x <= y) {
+    x++;
+
+    if (d > 0) {
+      y--;
+      d = d + 4 * (x-y) + 10;
+    }
+    else {
+      d = d + 4 * x + 6;
+    }
+
+    SSD1320::drawCircleGS(x0, y0, x, y, grayscale_background);
+    drawCircleSegment(x0, y0, x, y, parts, grayscale);
+  }
+
+  if (show_percentage){
+    int percentage = int(parts*12.5);
+    int x = 0;
+
+    if (percentage < 10) {
+      x = x0 - 2;
+    } else if (percentage < 100) {
+      x = x0 - 5;
+    } else {
+      x = x0 - 8;
+    }
+
+    SSD1320::printStringGS(x,y0 - 3,String(percentage),grayscale_percentage,0);
+  }
+}
+
+void VisRing::showNotification(int number, int grayscale){
+  String text = String(number);
+
+  if(number==1){
+     text += " new message";
+  }
+  else {
+    text += " new messages";
+  }
+
+  SSD1320::printStringGS(25,10,text,grayscale,0);
+}
+
+void VisRing::showNotificationIcon(int number, int grayscale){
+  SSD1320::printStringGS(85,10,String(number),grayscale,0);
+  drawEnvelope(60,9,grayscale);
 }
 
 void VisRing::drawHR(int hr, int grayscale, int grayscale_heart){

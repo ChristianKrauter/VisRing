@@ -157,6 +157,18 @@ void example_Notifications(){
   }
 }
 
+void example_NotificationsIcon(){
+  int len = 9;
+  int notification_counts[] = {1, 2, 3, 4, 4, 5, 5, 5, 6};
+
+  for (int i = 0; i < len; i ++){
+    VisRing.showNotificationIcon(notification_counts[i], 10);
+    VisRing.displayGS();
+    delay(1000);
+    VisRing.clearDisplayGS(0);
+  }
+}
+
 void example_Pattern(){
   for (int i = 0; i < 3; i ++) {
     VisRing.drawPattern(i);
@@ -178,9 +190,10 @@ void loop() {
   example_HearRate();
   example_BarChartHor();
   example_BarChartVert();
+  example_Notifications();
   example_lineChart();
   example_radialProgress();
-  example_Notifications();
+  example_NotificationsIcon();
   example_Pattern();
   example_Text();
 }
