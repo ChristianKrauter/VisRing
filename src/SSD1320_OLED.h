@@ -184,6 +184,7 @@ class SSD1320 : public Print {
     //void scrollVertLeft(uint8_t start, uint8_t stop);
 
     void scrollStop(void);
+    HardwareSerial* printer;
 
   private:
     uint8_t _sclk, _sd, _cs, _rst;
@@ -199,5 +200,4 @@ class SSD1320 : public Print {
     uint16_t fontMapWidth;
 
     uint8_t flipByte(uint8_t thing);
-    HardwareSerial* printer;
 };
