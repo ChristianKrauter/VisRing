@@ -118,6 +118,31 @@ void VisRing::drawPattern(int type)
   }
 }
 
+/// @brief Draws a slated background
+/// @param x0 x start position (bottom).
+/// @param x1 x end position (bottom).
+/// @param slant_offset x-axis offset (slant), note: extends shape to x0 + slant_offset.
+/// @param grayscale Grayscale value between 0 and 15.
+void VisRing::drawSlantedBackground(int x0, int x1, int slant_offset, int grayscale)
+{
+  for (int i = x0; i < x1; i++)
+  {
+    SSD1320::lineGS(i, 0, i + slant_offset, SSD1320::getDisplayHeight(), grayscale);
+  }
+}
+
+/// @brief Draws a fake heartbeat
+/// @param grayscale Grayscale value between 0 and 15.
+void VisRing::drawHeartBeat(int grayscale)
+{
+  for (int i = 70; i < 100; i += 8)
+  {
+    SSD1320::lineGS(i, 10, i + 4, 14, grayscale);
+    SSD1320::lineGS(i + 4, 14, i + 8, 10, grayscale);
+  }
+  SSD1320::lineGS(102, 10, 105, 13, grayscale);
+}
+
 /// @brief Draws scaled bar chart for horizontal screen orientation.
 /// @param values Heights of the bars.
 /// @param values_count Number of bars.
@@ -362,10 +387,35 @@ void VisRing::showNotificationIcon(int number, int grayscale)
 /// @brief Draws heart rate with heart icon.
 /// @param hr Heart rate value.
 /// @param grayscale Grayscale value between 0 and 15.
-/// @param grayscale_heart Grayscale value of heart between 0 and 15.
-void VisRing::drawHR(int hr, int grayscale, int grayscale_heart)
+/// @param grayscale_background Grayscale value of heart between 0 and 15.
+void VisRing::drawHR(int hr, int variant, int grayscale, int grayscale_background)
 {
   String text = String(hr) + " bpm";
-  drawHeart(100, 20, grayscale_heart);
-  SSD1320::printStringGS(55, 10, text, grayscale, 0);
+  int x0 = 50;
+
+  switch (variant)
+  {
+  case 0:
+    drawHeart(100, 20, grayscale_background);
+    if (hr / 10 < 10)
+    {
+      x0 = 55;
+    }
+
+    SSD1320::printStringGS(x0, 10, text, grayscale, 0);
+    break;
+
+  case 1:
+    drawHeart(102, 22, grayscale_background);
+    drawSlantedBackground(35, 65, 10, grayscale_background);
+    drawHeartBeat(grayscale_background);
+    if (hr / 10 >= 10)
+    {
+      x0 = 45;
+    }
+
+    SSD1320::printStringGS(x0, 10, String(hr), grayscale, 0);
+  default:
+    break;
+  }
 }

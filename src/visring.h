@@ -11,6 +11,8 @@ public:
     void drawHeart(int x, int y, int grayscale);
     void drawEnvelope(int x, int y, int grayscale);
     void drawPattern(int type);
+    void drawSlantedBackground(int x0, int x1, int slant_offset, int grayscale);
+    void drawHeartBeat(int grayscale);
 
     void drawBarChartHor(int values[], int values_count, int grayscale);
     void drawBarChartVert(int values[], int values_count, int grayscale);
@@ -21,5 +23,5 @@ public:
 
     void showNotification(int number, int grayscale);
     void showNotificationIcon(int number, int grayscale);
-    void drawHR(int hr, int grayscale, int grayscale_heart);
+    void drawHR(int hr, int variant, int grayscale, int grayscale_background);
 };
