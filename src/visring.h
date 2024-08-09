@@ -8,7 +8,7 @@ public:
     void scaleToMinMax(int target_min, int target_max, int values[], int values_count);
     void scaleToMinMaxKnownRange(int target_min, int target_max, int value_range_min, int value_range_max, int values[], int values_count);
 
-    void drawHeart(int x, int y, int grayscale);
+    void drawHeart(int x, int y, int fill_mode, int grayscale);
     void drawEnvelope(int x, int y, int grayscale);
     void drawPattern(int type);
     void drawSlantedBackground(int x0, int x1, int slant_offset, int grayscale);
@@ -24,4 +24,5 @@ public:
     void showNotification(int number, int grayscale);
     void showNotificationIcon(int number, int grayscale);
     void drawHR(int hr, int variant, int grayscale, int grayscale_background);
+    void drawHRZ(int hr, int grayscale, int grayscale_background);
 };

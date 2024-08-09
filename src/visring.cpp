@@ -56,23 +56,85 @@ void VisRing::scaleToMinMaxKnownRange(int target_min, int target_max, int value_
 /// @param x Value of lowest x value (left edge).
 /// @param y Value of highest y value (upper edge).
 /// @param grayscale Grayscale value between 0 and 15.
-void VisRing::drawHeart(int x, int y, int grayscale)
+void VisRing::drawHeart(int x, int y, int fill_mode, int grayscale)
 {
-  SSD1320::lineGS(x, y - 2, x, y - 6, grayscale);
-  SSD1320::lineGS(x + 1, y - 1, x + 1, y - 7, grayscale);
-  SSD1320::lineGS(x + 2, y, x + 2, y - 8, grayscale);
-  SSD1320::lineGS(x + 3, y, x + 3, y - 9, grayscale);
-  SSD1320::lineGS(x + 4, y, x + 4, y - 10, grayscale);
-  SSD1320::lineGS(x + 5, y - 1, x + 5, y - 11, grayscale);
+  switch (fill_mode)
+  {
+  case 0:
+    /* empty */
+    SSD1320::lineGS(x, y - 2, x, y - 6, grayscale);
+    SSD1320::setPixelGS(x + 1, y - 2, grayscale);
+    SSD1320::setPixelGS(x + 1, y - 7, grayscale);
+    SSD1320::setPixelGS(x + 2, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 2, y - 8, grayscale);
+    SSD1320::setPixelGS(x + 3, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 3, y - 9, grayscale);
+    SSD1320::setPixelGS(x + 4, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 4, y - 10, grayscale);
+    SSD1320::setPixelGS(x + 5, y - 2, grayscale);
+    SSD1320::setPixelGS(x + 5, y - 11, grayscale);
 
-  SSD1320::lineGS(x + 6, y - 2, x + 6, y - 12, grayscale);
+    SSD1320::setPixelGS(x + 6, y - 3, grayscale);
+    SSD1320::setPixelGS(x + 6, y - 12, grayscale);
 
-  SSD1320::lineGS(x + 7, y - 1, x + 7, y - 11, grayscale);
-  SSD1320::lineGS(x + 8, y, x + 8, y - 10, grayscale);
-  SSD1320::lineGS(x + 9, y, x + 9, y - 9, grayscale);
-  SSD1320::lineGS(x + 10, y, x + 10, y - 8, grayscale);
-  SSD1320::lineGS(x + 11, y - 1, x + 11, y - 7, grayscale);
-  SSD1320::lineGS(x + 12, y - 2, x + 12, y - 6, grayscale);
+    SSD1320::setPixelGS(x + 7, y - 2, grayscale);
+    SSD1320::setPixelGS(x + 7, y - 11, grayscale);
+    SSD1320::setPixelGS(x + 8, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 8, y - 10, grayscale);
+    SSD1320::setPixelGS(x + 9, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 9, y - 9, grayscale);
+    SSD1320::setPixelGS(x + 10, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 10, y - 8, grayscale);
+    SSD1320::setPixelGS(x + 11, y - 2, grayscale);
+    SSD1320::setPixelGS(x + 11, y - 7, grayscale);
+    SSD1320::lineGS(x + 12, y - 2, x + 12, y - 6, grayscale);
+    break;
+
+  case 1:
+    SSD1320::lineGS(x, y - 2, x, y - 6, grayscale);
+    SSD1320::setPixelGS(x + 1, y - 2, grayscale);
+    SSD1320::setPixelGS(x + 1, y - 7, grayscale);
+    SSD1320::setPixelGS(x + 2, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 2, y - 8, grayscale);
+    SSD1320::setPixelGS(x + 3, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 3, y - 9, grayscale);
+    SSD1320::setPixelGS(x + 4, y - 1, grayscale);
+    SSD1320::setPixelGS(x + 4, y - 10, grayscale);
+    SSD1320::setPixelGS(x + 5, y - 2, grayscale);
+    SSD1320::setPixelGS(x + 5, y - 11, grayscale);
+
+    SSD1320::lineGS(x + 6, y - 2, x + 6, y - 12, grayscale);
+
+    SSD1320::lineGS(x + 7, y - 1, x + 7, y - 11, grayscale);
+    SSD1320::lineGS(x + 8, y, x + 8, y - 10, grayscale);
+    SSD1320::lineGS(x + 9, y, x + 9, y - 9, grayscale);
+    SSD1320::lineGS(x + 10, y, x + 10, y - 8, grayscale);
+    SSD1320::lineGS(x + 11, y - 1, x + 11, y - 7, grayscale);
+    SSD1320::lineGS(x + 12, y - 2, x + 12, y - 6, grayscale);
+    break;
+
+  case 2:
+    /* full */
+    SSD1320::lineGS(x, y - 2, x, y - 6, grayscale);
+    SSD1320::lineGS(x + 1, y - 1, x + 1, y - 7, grayscale);
+    SSD1320::lineGS(x + 2, y, x + 2, y - 8, grayscale);
+    SSD1320::lineGS(x + 3, y, x + 3, y - 9, grayscale);
+    SSD1320::lineGS(x + 4, y, x + 4, y - 10, grayscale);
+    SSD1320::lineGS(x + 5, y - 1, x + 5, y - 11, grayscale);
+
+    SSD1320::lineGS(x + 6, y - 2, x + 6, y - 12, grayscale);
+
+    SSD1320::lineGS(x + 7, y - 1, x + 7, y - 11, grayscale);
+    SSD1320::lineGS(x + 8, y, x + 8, y - 10, grayscale);
+    SSD1320::lineGS(x + 9, y, x + 9, y - 9, grayscale);
+    SSD1320::lineGS(x + 10, y, x + 10, y - 8, grayscale);
+    SSD1320::lineGS(x + 11, y - 1, x + 11, y - 7, grayscale);
+    SSD1320::lineGS(x + 12, y - 2, x + 12, y - 6, grayscale);
+    break;
+
+  default:
+    break;
+  }
 }
 
 /// @brief Draws an envelope icon.
@@ -396,7 +458,7 @@ void VisRing::drawHR(int hr, int variant, int grayscale, int grayscale_backgroun
   switch (variant)
   {
   case 0:
-    drawHeart(100, 20, grayscale_background);
+    drawHeart(100, 20, 2, grayscale_background);
     if (hr / 10 < 10)
     {
       x0 = 55;
@@ -406,7 +468,7 @@ void VisRing::drawHR(int hr, int variant, int grayscale, int grayscale_backgroun
     break;
 
   case 1:
-    drawHeart(102, 22, grayscale_background);
+    drawHeart(102, 22, 2, grayscale_background);
     drawSlantedBackground(35, 65, 10, grayscale_background);
     drawHeartBeat(grayscale_background);
     if (hr / 10 >= 10)
@@ -418,4 +480,34 @@ void VisRing::drawHR(int hr, int variant, int grayscale, int grayscale_backgroun
   default:
     break;
   }
+}
+
+/// @brief Draws heart rate with heart icon.
+/// @param hr Heart rate value.
+/// @param grayscale Grayscale value between 0 and 15.
+/// @param grayscale_background Grayscale value of heart between 0 and 15.
+void VisRing::drawHRZ(int hr, int grayscale, int grayscale_background)
+{
+  int x0 = 60;
+
+  // Heartrate Zones
+  if (hr <= 92) // Low: 50-92 and below
+  {
+    drawHeart(80, 20, 0, grayscale_background);
+  }
+  else if (hr <= 157) // Medium: 93-157
+
+  {
+    drawHeart(80, 20, 1, grayscale_background);
+  }
+  else // High: 157 - 185
+  {
+    drawHeart(80, 20, 2, grayscale_background);
+  }
+
+  if (hr / 10 >= 10)
+  {
+    x0 = 55;
+  }
+  SSD1320::printStringGS(x0, 10, String(hr), grayscale, 0);
 }
