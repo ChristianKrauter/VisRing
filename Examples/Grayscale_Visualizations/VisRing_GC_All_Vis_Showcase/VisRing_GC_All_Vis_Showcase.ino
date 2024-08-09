@@ -247,7 +247,7 @@ void example_Pattern()
 void example_Text()
 {
   String text = "Please remember that we are meeting with Lars today at 4 pm at the bus stop. Can you be there at 3:30?";
-  VisRing.printStringGS(0, 24, text, 15, 0);
+  VisRing.printStringGS(0, 24, text, false, 15, 0);
   VisRing.displayGS();
   delay(3000);
   VisRing.clearDisplayGS();

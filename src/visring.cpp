@@ -414,7 +414,7 @@ void VisRing::radialProgressChart(int x0, int y0, int radius, int parts, bool sh
       x = x0 - 8;
     }
 
-    SSD1320::printStringGS(x, y0 - 3, String(percentage), grayscale_percentage, 0);
+    SSD1320::printStringGS(x, y0 - 3, String(percentage), false, grayscale_percentage, 0);
   }
 }
 
@@ -434,7 +434,7 @@ void VisRing::showNotification(int number, int grayscale)
     text += " notifications";
   }
 
-  SSD1320::printStringGS(25, 10, text, grayscale, 0);
+  SSD1320::printStringGS(25, 10, text, false, grayscale, 0);
 }
 
 /// @brief Draws notification with envelope icon.
@@ -442,7 +442,7 @@ void VisRing::showNotification(int number, int grayscale)
 /// @param grayscale Grayscale value between 0 and 15.
 void VisRing::showNotificationIcon(int number, int grayscale)
 {
-  SSD1320::printStringGS(85, 5, String(number), grayscale, 1);
+  SSD1320::printStringGS(85, 5, String(number), false, grayscale, 1);
   drawEnvelope(60, 9, grayscale);
 }
 
@@ -464,7 +464,7 @@ void VisRing::drawHR(int hr, int variant, int grayscale, int grayscale_backgroun
       x0 = 55;
     }
 
-    SSD1320::printStringGS(x0, 10, text, grayscale, 0);
+    SSD1320::printStringGS(x0, 10, text, false, grayscale, 0);
     break;
 
   case 1:
@@ -476,7 +476,7 @@ void VisRing::drawHR(int hr, int variant, int grayscale, int grayscale_backgroun
       x0 = 45;
     }
 
-    SSD1320::printStringGS(x0, 10, String(hr), grayscale, 0);
+    SSD1320::printStringGS(x0, 10, String(hr), false, grayscale, 0);
   default:
     break;
   }
@@ -509,5 +509,5 @@ void VisRing::drawHRZ(int hr, int grayscale, int grayscale_background)
   {
     x0 = 55;
   }
-  SSD1320::printStringGS(x0, 10, String(hr), grayscale, 0);
+  SSD1320::printStringGS(x0, 10, String(hr), false, grayscale, 0);
 }
