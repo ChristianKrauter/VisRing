@@ -1113,7 +1113,7 @@ void SSD1320::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color, uint8_t m
       // The fonts really need to be updated
       temp = flipByte(temp);
 
-      for (j = -1; j < 8; j++)
+      for (j = 0; j < 8; j++)
       {
         if (temp & 0x01)
         {
