@@ -294,14 +294,22 @@ void VisRing::drawBarChartVertSmallMultiples(int values[7][16], int charts_count
 /// @param values Heights of the line.
 /// @param values_count Number of values.
 /// @param grayscale Grayscale value between 0 and 15.
-void VisRing::lineChart(int values[], int values_count, int grayscale)
+void VisRing::lineChart(int values[], int values_count, bool fixed_scaling, int value_range_min, int value_range_max, int grayscale)
 {
   if (values_count > 160 | values_count < 2)
   {
     return;
   }
 
-  scaleToMinMax(0, SSD1320::getDisplayHeight(), values, values_count);
+  if (fixed_scaling)
+  {
+    scaleToMinMaxKnownRange(0, SSD1320::getDisplayHeight(), value_range_min, value_range_max, values, values_count);
+  }
+  else
+  {
+    scaleToMinMax(0, SSD1320::getDisplayHeight(), values, values_count);
+  }
+
   int step_size = SSD1320::getDisplayWidth() / (values_count - 1);
 
   for (int i = 0; i < values_count - 1; i++)
