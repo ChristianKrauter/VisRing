@@ -22,16 +22,29 @@ void setup()
   VisRing.clearDisplayGS();
 }
 
-void example_HearRate()
-{
-  int hr[] = {50, 55, 60, 60, 65, 70, 90, 100, 90, 70, 50, 50};
+void example_HearRate() {
+  int hr[] = { 50, 55, 60, 60, 65, 70, 70, 90, 100, 100, 90, 70, 50, 50 };
 
-  for (int val : hr)
-  {
-    VisRing.drawHR(val, 15, 7);
-    VisRing.displayGS();
-    delay(500);
-    VisRing.clearDisplayGS();
+  for (int variant = 0; variant < 2; variant++) {
+    for (int val : hr) {
+      VisRing.drawHR(val, variant, 15, 4);
+      VisRing.displayGS();
+      delay(500);
+      VisRing.clearDisplayGS();
+    }
+  }
+}
+
+void example_HearRateZone() {
+  int hr[] = {40, 50, 55, 60, 60, 65, 90, 100, 150, 160, 170, 190, 150, 130, 120, 100, 90, 70, 50, 40};
+
+  for (int variant = 0; variant < 2; variant++) {
+    for (int val : hr) {
+      VisRing.drawHRZ(val, 15, 4);
+      VisRing.displayGS();
+      delay(500);
+      VisRing.clearDisplayGS();
+    }
   }
 }
 
@@ -243,6 +256,7 @@ void example_Text()
 void loop()
 {
   example_HearRate();
+  example_HearRateZone();
   example_BarChartHor();
   example_BarChartVert();
   example_Notifications();
