@@ -16,7 +16,7 @@ void setup() {
   SPI.begin();
   Serial.begin(115200);
   VisRing.begin(160, 32, printer);  // Display is 160 wide, 32 high
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 }
 
 void example_HearRateOverTime() {
@@ -31,7 +31,7 @@ void example_HearRateOverTime() {
   VisRing.printStringGS(80, 15, String(hr[40]), true, 0, 0);
   VisRing.displayGS();
   delay(500);
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 }
 
 void loop() {

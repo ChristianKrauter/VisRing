@@ -17,7 +17,7 @@ void setup()
   SPI.begin();
   Serial.begin(115200);
   VisRing.begin(160, 32, printer); // Display is 160 wide, 32 high
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 }
 
 void example_Pattern()
@@ -27,7 +27,7 @@ void example_Pattern()
     VisRing.drawPattern(i);
     VisRing.displayGS();
     delay(500);
-    VisRing.clearDisplayGS();
+    VisRing.clearDisplayGS(2);
   }
 }
 

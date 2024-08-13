@@ -17,7 +17,7 @@ void setup()
   SPI.begin();
   Serial.begin(115200);
   VisRing.begin(160, 32, printer); // Display is 160 wide, 32 high
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 }
 
 void example_BarChartVert()
@@ -27,21 +27,21 @@ void example_BarChartVert()
   VisRing.drawBarChartVert(values, values_count, 15);
   VisRing.displayGS();
   delay(500);
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 
   int values_count_2 = 8;
   int values_2[values_count_2] = {5, 10, 15, 20, 30, 35, 40, 45};
   VisRing.drawBarChartVert(values_2, values_count_2, 15);
   VisRing.displayGS();
   delay(500);
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 
   int values_count_3 = 16;
   int values_3[values_count_3] = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80};
   VisRing.drawBarChartVert(values_3, values_count_3, 15);
   VisRing.displayGS();
   delay(500);
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 }
 
 void loop()
