@@ -46,9 +46,8 @@ uint32_t rxCount = 0;
 uint32_t rxStartTime = 0;
 uint32_t rxLastTime = 0;
 
-
-const byte RATE_SIZE = 4; //Increase this for more averaging. 4 is good.
-byte rates[RATE_SIZE]; //Array of heart rates
+const byte RATE_SIZE = 60;  //Increase this for more averaging. 4 is good.
+byte rates[RATE_SIZE];      //Array of heart rates
 byte rateSpot = 0;
 long lastBeat = 0;  //Time at which the last beat occurred
 
@@ -168,6 +167,10 @@ void setup() {
   bleuart.setRxCallback(bleuart_rx_callback);
   bleuart.setNotifyCallback(bleuart_notify_callback);
 
+  for (byte x = 0; x < RATE_SIZE; x++) {
+    rates[x] = (byte)70;
+  }
+
   // Set up and start advertising
   startAdv();
   Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
@@ -200,10 +203,25 @@ void display_tmp(void) {
     flexibleOLED.display();
     display_time = millis();
   }
-
 }
 
-void startAdv(void)
+void display_hr(void) {
+  long diff_display = millis() - display_time;
+  //  Serial.println(diff_display);
+  //  delay(5000);
+  if (diff_display > 3000) {
+    flexibleOLED.clearDisplay();  //Clear display and buffer
+    flexibleOLED.setFontType(0);  //Large font
+    flexibleOLED.setCursor(10, 12);
+    flexibleOLED.print("Hr: ");
+    flexibleOLED.print(ALL_MAX[1]);
+    flexibleOLED.print(" Avg: ");
+    flexibleOLED.print(ALL_MAX[2]);
+    flexibleOLED.display();
+    display_time = millis();
+  }
+}
+
 void startAdv(void) {
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
   Bluefruit.Advertising.addTxPower();
@@ -278,12 +296,17 @@ void bleuart_rx_callback(uint16_t conn_hdl) {
     rxStartTime = millis();
   }
 
-  uint32_t count = bleuart.available();
+  while (bleuart.available()) {
+    Serial.printf((char) bleuart.read());
+  }
+  //uint32_t count = bleuart.available();
 
-  rxCount += count;
-  bleuart.flush(); // empty rx fifo
+  //rxCount += count;
+  //bleuart.flush();  // empty rx fifo
 
-  // Serial.printf("RX %d bytes\n", count);
+  //Serial.printf(bleuart.read()*);
+  
+  //Serial.printf("RX %d bytes\n", count);
 }
 
 void bleuart_notify_callback(uint16_t conn_hdl, bool enabled) {
@@ -373,7 +396,8 @@ void loop() {
     get_tmp_data();
     if (ALL_MAX[0] != -1) {
       ALL_MAX[total_num_data - 1] = send_time;
-      //      print_all_max();
+      //print_all_max();
+      //display_hr();
       display_tmp();
       send_message();
       COUNT += 1;
