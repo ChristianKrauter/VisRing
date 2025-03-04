@@ -297,7 +297,7 @@ void bleuart_rx_callback(uint16_t conn_hdl) {
   }
 
   while (bleuart.available()) {
-    Serial.printf((char) bleuart.read());
+    Serial.print((char) bleuart.read());
   }
   //uint32_t count = bleuart.available();
 
@@ -365,9 +365,9 @@ void get_imu_data(void) {
   if (myICM.dataReady()) {
     myICM.getAGMT();  // The values are only updated when you call 'getAGMT'
     float ALL_IMU[] = {
-      myICM.accX() * 0.01, myICM.accY() * 0.01, myICM.accZ() * 0.01,  // acceleration is measured in m/s^2
-      myICM.gyrX(), myICM.gyrY(), myICM.gyrZ(),                       // magnetometer is measured in uT
-      myICM.magX(), myICM.magY(), myICM.magZ(),                       // gyro is measured in radians/s
+      myICM.accX() * 0.01f, myICM.accY() * 0.01f, myICM.accZ() * 0.01f,  // acceleration is measured in m/s^2
+      myICM.gyrX(), myICM.gyrY(), myICM.gyrZ(),                          // magnetometer is measured in uT
+      myICM.magX(), myICM.magY(), myICM.magZ(),                          // gyro is measured in radians/s
     };
 
 
