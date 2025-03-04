@@ -27,13 +27,14 @@
 #include <InternalFileSystem.h>
 #include <Adafruit_TMP117.h>
 #include <Adafruit_Sensor.h>
-// Liraries for Json
 #include "ArduinoJson.h"
 #include <SPI.h>
-
 #include "ICM_20948.h"  // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
 #define CS_PIN 2        // Which pin you connect CS to. Used only when "USE_SPI" is defined
-ICM_20948_SPI myICM;    // If using SPI create an ICM_20948_SPI object
+#include "ArduinoJson.h"
+#include <SSD1320_OLED.h>
+
+ICM_20948_SPI myICM;  // If using SPI create an ICM_20948_SPI object
 Adafruit_TMP117 tmp117;
 
 long display_time = millis();
@@ -46,10 +47,10 @@ uint32_t rxCount = 0;
 uint32_t rxStartTime = 0;
 uint32_t rxLastTime = 0;
 
-const byte RATE_SIZE = 60;  //Increase this for more averaging. 4 is good.
-byte rates[RATE_SIZE];      //Array of heart rates
+const byte RATE_SIZE = 60;  // Increase this for more averaging. 4 is good.
+byte rates[RATE_SIZE];      // Array of heart rates
 byte rateSpot = 0;
-long lastBeat = 0;  //Time at which the last beat occurred
+long lastBeat = 0;  // Time at which the last beat occurred
 
 float beatsPerMinute;
 int beatAvg;
@@ -65,13 +66,10 @@ float ALL_MAX[14] = {
   -1, -1
 };
 
-// Liraries for Json
-#include "ArduinoJson.h"
+
 
 int COUNT;
-#include <SSD1320_OLED.h>
 SSD1320 flexibleOLED(15, 16, 12, 13);  // NRF52832 15 = CS, 16 = RES, 13 = SCLK, 11 = SDIN
-
 
 void setup() {
   Serial.begin(115200);
@@ -80,14 +78,14 @@ void setup() {
   Wire.setClock(3400000);
   Wire.begin();
   SPI.begin();
-  flexibleOLED.begin(160, 32);  //Display is 160 wide, 32 high
-  //Setup to sense up to 18 inches, max LED brightness
-  byte ledBrightness = 0xFF;  //Options: 0=Off to 255=50mA
-  byte sampleAverage = 1;     //Options: 1, 2, 4, 8, 16, 32
-  byte ledMode = 3;           //Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
-  int sampleRate = 1600;      //Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
-  int pulseWidth = 411;       //Options: 69, 118, 215, 411
-  int adcRange = 16384;       //Options: 2048, 4096, 8192, 16384
+  flexibleOLED.begin(160, 32);  // Display is 160 wide, 32 high
+  // Setup to sense up to 18 inches, max LED brightness
+  byte ledBrightness = 0xFF;  // Options: 0=Off to 255=50mA
+  byte sampleAverage = 1;     // Options: 1, 2, 4, 8, 16, 32
+  byte ledMode = 3;           // Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
+  int sampleRate = 1600;      // Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
+  int pulseWidth = 411;       // Options: 69, 118, 215, 411
+  int adcRange = 16384;       // Options: 2048, 4096, 8192, 16384
 
   // Initialize sensor
   if (particleSensor.begin(Wire, I2C_SPEED_FAST, 0x57) == false) {
@@ -96,7 +94,7 @@ void setup() {
       ;
   }
 
-  particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);  //Configure sensor. Use 6.4mA for LED drive
+  particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);  // Configure sensor. Use 6.4mA for LED drive
   particleSensor.setPulseAmplitudeRed(0x50);
   particleSensor.setPulseAmplitudeIR(0x50);
   particleSensor.setPulseAmplitudeGreen(0x96);
@@ -135,7 +133,6 @@ void setup() {
     }
   }
   Serial.println("ICM20948 Success!");
-
 
   Serial.println("Bluefruit52 Throughput Example");
   Serial.println("------------------------------\n");
@@ -176,14 +173,13 @@ void setup() {
   Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
   Serial.println("Once connected, enter character(s) that you wish to send");
 
+  flexibleOLED.clearDisplay();  // Clear display and buffer
 
-  flexibleOLED.clearDisplay();  //Clear display and buffer
-
-  flexibleOLED.setFontType(0);  //Large font
+  flexibleOLED.setFontType(0);  // Large font
   flexibleOLED.setCursor(15, 12);
   flexibleOLED.print("Hi VisRing");
 
-  flexibleOLED.setFontType(0);  //Small font
+  flexibleOLED.setFontType(0);  // Small font
   flexibleOLED.setCursor(80, 0);
   flexibleOLED.print("PSU x VISVAR");
 
@@ -195,8 +191,8 @@ void display_tmp(void) {
   //  Serial.println(diff_display);
   //  delay(5000);
   if (diff_display > 3000) {
-    flexibleOLED.clearDisplay();  //Clear display and buffer
-    flexibleOLED.setFontType(0);  //Large font
+    flexibleOLED.clearDisplay();  // Clear display and buffer
+    flexibleOLED.setFontType(0);  // Large font
     flexibleOLED.setCursor(20, 12);
     flexibleOLED.print("Tmp:  ");
     flexibleOLED.print(ALL_MAX[total_num_data - 2]);
@@ -210,8 +206,8 @@ void display_hr(void) {
   //  Serial.println(diff_display);
   //  delay(5000);
   if (diff_display > 3000) {
-    flexibleOLED.clearDisplay();  //Clear display and buffer
-    flexibleOLED.setFontType(0);  //Large font
+    flexibleOLED.clearDisplay();  // Clear display and buffer
+    flexibleOLED.setFontType(0);  // Large font
     flexibleOLED.setCursor(10, 12);
     flexibleOLED.print("Hr: ");
     flexibleOLED.print(ALL_MAX[1]);
@@ -265,7 +261,7 @@ void connect_callback(uint16_t conn_handle) {
   conn->requestMtuExchange(247);
 
   // request connection interval of 7.5 ms
-  //conn->requestConnectionParameter(6); // in unit of 1.25
+  // conn->requestConnectionParameter(6); // in unit of 1.25
 
   // delay a bit for all the request to complete
   delay(1000);
@@ -299,14 +295,6 @@ void bleuart_rx_callback(uint16_t conn_hdl) {
   while (bleuart.available()) {
     Serial.print((char) bleuart.read());
   }
-  //uint32_t count = bleuart.available();
-
-  //rxCount += count;
-  //bleuart.flush();  // empty rx fifo
-
-  //Serial.printf(bleuart.read()*);
-  
-  //Serial.printf("RX %d bytes\n", count);
 }
 
 void bleuart_notify_callback(uint16_t conn_hdl, bool enabled) {
@@ -323,7 +311,7 @@ void clear_all_max() {
 
 void get_ppg_data(void) {
   particleSensor.check();
-  while (particleSensor.available())  //do we have new data?
+  while (particleSensor.available())  // do we have new data?
   {
     ALL_MAX[0] = particleSensor.getFIFORed();
     ALL_MAX[1] = particleSensor.getFIFOIR();
@@ -338,17 +326,17 @@ void get_hr_data(void) {
   long irValue = particleSensor.getIR();
 
   if (checkForBeat(irValue) == true) {
-    //We sensed a beat!
+    // We sensed a beat!
     long delta = millis() - lastBeat;
     lastBeat = millis();
 
     beatsPerMinute = 60 / (delta / 1000.0);
 
     if (beatsPerMinute < 255 && beatsPerMinute > 20) {
-      rates[rateSpot++] = (byte)beatsPerMinute;  //Store this reading in the array
-      rateSpot %= RATE_SIZE;                     //Wrap variable
+      rates[rateSpot++] = (byte)beatsPerMinute;  // Store this reading in the array
+      rateSpot %= RATE_SIZE;                     // Wrap variable
 
-      //Take average of readings
+      // Take average of readings
       beatAvg = 0;
       for (byte x = 0; x < RATE_SIZE; x++)
         beatAvg += rates[x];
@@ -370,11 +358,9 @@ void get_imu_data(void) {
       myICM.magX(), myICM.magY(), myICM.magZ(),                          // gyro is measured in radians/s
     };
 
-
     for (int i = 0; i < 9; i++) {
       ALL_MAX[3 + i] = ALL_IMU[i];
     }
-
   } else {
     Serial.println("Waiting for data");
     delay(500);
@@ -396,8 +382,8 @@ void loop() {
     get_tmp_data();
     if (ALL_MAX[0] != -1) {
       ALL_MAX[total_num_data - 1] = send_time;
-      //print_all_max();
-      //display_hr();
+      // print_all_max();
+      // display_hr();
       display_tmp();
       send_message();
       COUNT += 1;
@@ -425,12 +411,11 @@ void send_message(void) {
   int total_size = total_num_data * 4;
   byte byteArray[total_size];  // 10+1
 
-
   for (int i = 0; i < total_num_data; i++) {
-    byteArray[i * 4] = ((uint8_t*)&ALL_MAX[i])[0];
-    byteArray[i * 4 + 1] = ((uint8_t*)&ALL_MAX[i])[1];
-    byteArray[i * 4 + 2] = ((uint8_t*)&ALL_MAX[i])[2];
-    byteArray[i * 4 + 3] = ((uint8_t*)&ALL_MAX[i])[3];
+    byteArray[i * 4] = ((uint8_t *)&ALL_MAX[i])[0];
+    byteArray[i * 4 + 1] = ((uint8_t *)&ALL_MAX[i])[1];
+    byteArray[i * 4 + 2] = ((uint8_t *)&ALL_MAX[i])[2];
+    byteArray[i * 4 + 3] = ((uint8_t *)&ALL_MAX[i])[3];
   }
 
   size_t sent_data_size = bleuart.write(byteArray, sizeof(byteArray));
