@@ -65,6 +65,9 @@ void oled_setup() {
 //////////////////////
 
 ICM_20948_SPI imu;  // If using SPI create an ICM_20948_SPI object
+bool print_acc = true;
+bool print_gyr = false;
+bool print_mag = false;
 
 void imu_setup() {
   imu.enableDebugging();  // Uncomment this line to enable helpful debug messages on Serial
@@ -110,29 +113,37 @@ void display_imu() {
   if (data[0] != -1) {
 
     flexibleOLED.setFontType(0);
-    flexibleOLED.setCursor(10, 0);
-    flexibleOLED.print("acc X: ");
-    flexibleOLED.print(data[0], 0);
-    flexibleOLED.print("  Y: ");
-    flexibleOLED.print(data[1], 0);
-    flexibleOLED.print("  Z: ");
-    flexibleOLED.println(data[2], 0);
 
-    flexibleOLED.setCursor(10, 12);
-    flexibleOLED.print("gyr X: ");
-    flexibleOLED.print(data[3], 0);
-    flexibleOLED.print("  Y: ");
-    flexibleOLED.print(data[4], 0);
-    flexibleOLED.print("  Z: ");
-    flexibleOLED.print(data[5], 0);
+    if (print_acc) {
+      flexibleOLED.setCursor(10, 0);
+      flexibleOLED.print("acc X: ");
+      flexibleOLED.print(data[0], 0);
+      flexibleOLED.print("  Y: ");
+      flexibleOLED.print(data[1], 0);
+      flexibleOLED.print("  Z: ");
+      flexibleOLED.println(data[2], 0);
+    }
 
-    flexibleOLED.setCursor(10, 24);
-    flexibleOLED.print("mag X: ");
-    flexibleOLED.print(data[6], 0);
-    flexibleOLED.print("  Y: ");
-    flexibleOLED.print(data[7], 0);
-    flexibleOLED.print("  Z: ");
-    flexibleOLED.print(data[8], 0);
+    if (print_gyr) {
+      flexibleOLED.setCursor(10, 12);
+      flexibleOLED.print("gyr X: ");
+      flexibleOLED.print(data[3], 0);
+      flexibleOLED.print("  Y: ");
+      flexibleOLED.print(data[4], 0);
+      flexibleOLED.print("  Z: ");
+      flexibleOLED.print(data[5], 0);
+    }
+
+    if (print_mag) {
+      flexibleOLED.setCursor(10, 24);
+      flexibleOLED.print("mag X: ");
+      flexibleOLED.print(data[6], 0);
+      flexibleOLED.print("  Y: ");
+      flexibleOLED.print(data[7], 0);
+      flexibleOLED.print("  Z: ");
+      flexibleOLED.print(data[8], 0);
+    }
+
     flexibleOLED.display();
 
     print_data();
@@ -149,32 +160,38 @@ void clear_data() {
   }
 }
 
-void print_data()
-{
-  Serial.print("acc X: ");
-  Serial.print(data[0]);
-  Serial.print("  Y: ");
-  Serial.print(data[1]);
-  Serial.print("  Z: ");
-  Serial.print(data[2]);
+void print_data() {
 
-  Serial.print(" - ");
+  if (print_acc) {
+    Serial.print("acc X: ");
+    Serial.print(data[0]);
+    Serial.print("  Y: ");
+    Serial.print(data[1]);
+    Serial.print("  Z: ");
+    Serial.print(data[2]);
+  }
+
+  if (print_gyr) {
+    Serial.print(" - ");
+    Serial.print("gyr X: ");
+    Serial.print(data[3]);
+    Serial.print("  Y: ");
+    Serial.print(data[4]);
+    Serial.print("  Z: ");
+    Serial.print(data[5]);
+  }
+
+  if (print_mag) {
+    Serial.print(" - ");
+    Serial.print("mag X: ");
+    Serial.print(data[6]);
+    Serial.print("  Y: ");
+    Serial.print(data[7]);
+    Serial.print("  Z: ");
+    Serial.print(data[8]);
+  }
   
-  Serial.print("gyr X: ");
-  Serial.print(data[3]);
-  Serial.print("  Y: ");
-  Serial.print(data[4]);
-  Serial.print("  Z: ");
-  Serial.print(data[5]);
-
-  Serial.print(" - ");
-
-  Serial.print("mag X: ");
-  Serial.print(data[6]);
-  Serial.print("  Y: ");
-  Serial.print(data[7]);
-  Serial.print("  Z: ");
-  Serial.println(data[8]);
+  Serial.println();
 }
 
 void setup() {
