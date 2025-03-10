@@ -16,8 +16,6 @@
 
 VisRing VisRing(15, 16, 12, 13);
 
-long display_time = millis();
-
 float data[9] = {
   -1,
   -1,
@@ -110,14 +108,9 @@ void display_imu() {
     }
 
     VisRing.displayGS();
-
     print_data();
   }
 }
-
-//////////////////
-////// main //////
-//////////////////
 
 void clear_data() {
   for (int i = 0; i < 9; i++) {

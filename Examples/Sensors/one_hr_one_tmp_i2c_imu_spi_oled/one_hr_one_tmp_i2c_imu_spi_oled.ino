@@ -383,8 +383,8 @@ void loop() {
     if (ALL_MAX[0] != -1) {
       ALL_MAX[total_num_data - 1] = send_time;
       // print_all_max();
-      // display_hr();
-      display_tmp();
+      display_hr();
+      //display_tmp();
       send_message();
       COUNT += 1;
     }
