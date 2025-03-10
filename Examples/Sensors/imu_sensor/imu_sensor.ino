@@ -1,22 +1,5 @@
 /*
-  MAX30105 Breakout: Output all the raw Red/IR/Green readings
-  By: Nathan Seidle @ SparkFun Electronics
-  Date: October 2nd, 2016
-  https://github.com/sparkfun/MAX30105_Breakout
-
-  Outputs all Red/IR/Green values.
-
-  Hardware Connections (Breakoutboard to Arduino):
-  -5V = 5V (3.3V is allowed)
-  -GND = GND
-  -SDA = A4 (or SDA)
-  -SCL = A5 (or SCL)
-  -INT = Not connected
-
-  The MAX30105 Breakout can handle 5V or 3.3V I2C logic. We recommend powering the board with 5V
-  but it will also run at 3.3V.
-
-  This code is released under the [MIT License](http://opensource.org/licenses/MIT).
+  VisRing code to read and display IMU values.
 */
 
 // General
@@ -29,11 +12,9 @@
 #define CS_PIN 2        // Which pin you connect CS to. Used only when "USE_SPI" is defined
 
 // oled
-#include <SSD1320_OLED.h>
+#include <VisRing.h>
 
-//////////////////////
-/////// general //////
-//////////////////////
+VisRing VisRing(15, 16, 12, 13);
 
 long display_time = millis();
 
@@ -49,25 +30,10 @@ float data[9] = {
   -1,
 };
 
-//////////////////////
-//////// oled ////////
-//////////////////////
-
-SSD1320 flexibleOLED(15, 16, 12, 13);  // NRF52832 15 = CS, 16 = RES, 13 = SCLK, 11 = SDIN
-
-void oled_setup() {
-  flexibleOLED.begin(160, 32);  // Display is 160 wide, 32 high
-  flexibleOLED.clearDisplay();
-}
-
-//////////////////////
-///// imu sensor /////
-//////////////////////
-
 ICM_20948_SPI imu;  // If using SPI create an ICM_20948_SPI object
 bool print_acc = true;
-bool print_gyr = false;
-bool print_mag = false;
+bool print_gyr = true;
+bool print_mag = true;
 
 void imu_setup() {
   imu.enableDebugging();  // Uncomment this line to enable helpful debug messages on Serial
@@ -111,40 +77,39 @@ void get_imu_data(void) {
 
 void display_imu() {
   if (data[0] != -1) {
-
-    flexibleOLED.setFontType(0);
+    VisRing.clearDisplayGS();
 
     if (print_acc) {
-      flexibleOLED.setCursor(10, 0);
-      flexibleOLED.print("acc X: ");
-      flexibleOLED.print(data[0], 0);
-      flexibleOLED.print("  Y: ");
-      flexibleOLED.print(data[1], 0);
-      flexibleOLED.print("  Z: ");
-      flexibleOLED.println(data[2], 0);
+      VisRing.printStringGS(
+        10,
+        0,
+        "acc X:" + (String)data[0] + "  Y:" + (String)data[1] + "  Z:" + (String)data[2],
+        false,
+        15,
+        0);
     }
 
     if (print_gyr) {
-      flexibleOLED.setCursor(10, 12);
-      flexibleOLED.print("gyr X: ");
-      flexibleOLED.print(data[3], 0);
-      flexibleOLED.print("  Y: ");
-      flexibleOLED.print(data[4], 0);
-      flexibleOLED.print("  Z: ");
-      flexibleOLED.print(data[5], 0);
+      VisRing.printStringGS(
+        10,
+        12,
+        "gyr X:" + (String)data[3] + "  Y:" + (String)data[4] + "  Z:" + (String)data[5],
+        false,
+        15,
+        0);
     }
 
     if (print_mag) {
-      flexibleOLED.setCursor(10, 24);
-      flexibleOLED.print("mag X: ");
-      flexibleOLED.print(data[6], 0);
-      flexibleOLED.print("  Y: ");
-      flexibleOLED.print(data[7], 0);
-      flexibleOLED.print("  Z: ");
-      flexibleOLED.print(data[8], 0);
+      VisRing.printStringGS(
+        10,
+        24,
+        "mag X:" + (String)data[6] + "  Y:" + (String)data[7] + "  Z:" + (String)data[8],
+        false,
+        15,
+        0);
     }
 
-    flexibleOLED.display();
+    VisRing.displayGS();
 
     print_data();
   }
@@ -163,35 +128,16 @@ void clear_data() {
 void print_data() {
 
   if (print_acc) {
-    Serial.print("acc X: ");
-    Serial.print(data[0]);
-    Serial.print("  Y: ");
-    Serial.print(data[1]);
-    Serial.print("  Z: ");
-    Serial.print(data[2]);
+    Serial.println("acc X: " + (String)data[0] + "  Y: " + (String)data[1] + "  Z: " + (String)data[2]);
   }
 
   if (print_gyr) {
-    Serial.print(" - ");
-    Serial.print("gyr X: ");
-    Serial.print(data[3]);
-    Serial.print("  Y: ");
-    Serial.print(data[4]);
-    Serial.print("  Z: ");
-    Serial.print(data[5]);
+    Serial.println("gyr X: " + (String)data[3] + "  Y: " + (String)data[4] + "  Z: " + (String)data[5]);
   }
 
   if (print_mag) {
-    Serial.print(" - ");
-    Serial.print("mag X: ");
-    Serial.print(data[6]);
-    Serial.print("  Y: ");
-    Serial.print(data[7]);
-    Serial.print("  Z: ");
-    Serial.print(data[8]);
+    Serial.println("mag X: " + (String)data[6] + "  Y: " + (String)data[7] + "  Z: " + (String)data[8]);
   }
-  
-  Serial.println();
 }
 
 void setup() {
@@ -200,11 +146,16 @@ void setup() {
   Wire.begin();
   SPI.begin();
 
-  oled_setup();
   imu_setup();
+
+  VisRing.begin(160, 32);  // Display is 160 wide, 32 high
+  VisRing.displayGS();
+  delay(1000);
+  VisRing.clearDisplayGS();
 }
 
 void loop() {
   get_imu_data();
   display_imu();
+  delay(1000);
 }
