@@ -1,22 +1,5 @@
 /*
-  MAX30105 Breakout: Output all the raw Red/IR/Green readings
-  By: Nathan Seidle @ SparkFun Electronics
-  Date: October 2nd, 2016
-  https://github.com/sparkfun/MAX30105_Breakout
-
-  Outputs all Red/IR/Green values.
-
-  Hardware Connections (Breakoutboard to Arduino):
-  -5V = 5V (3.3V is allowed)
-  -GND = GND
-  -SDA = A4 (or SDA)
-  -SCL = A5 (or SCL)
-  -INT = Not connected
-
-  The MAX30105 Breakout can handle 5V or 3.3V I2C logic. We recommend powering the board with 5V
-  but it will also run at 3.3V.
-
-  This code is released under the [MIT License](http://opensource.org/licenses/MIT).
+  VisRing Bluetooth code to send and receive data via BLE UART.
 */
 
 // General
@@ -29,23 +12,12 @@
 // bluetooth
 #include <bluefruit.h>
 
-//////////////////////
-/////// general //////
-//////////////////////
+// oled
+#include <VisRing.h>
+
+VisRing VisRing(15, 16, 12, 13);
 
 int total_num_data = 14;
-
-float ALL_MAX[14] = {
-  -1, -1, -1,
-  -1, -1, -1,
-  -1, -1, -1,
-  -1, -1, -1,
-  -1, -1
-};
-
-///////////////////////
-////// bluetooth //////
-///////////////////////
 
 BLEDis bledis;
 BLEUart bleuart;
@@ -88,8 +60,8 @@ void bluetooth_setup() {
   Serial.println("Once connected, enter character(s) that you wish to send");
 }
 
-void send_message(String msg) {
-  size_t sent_data_size = bleuart.write("test");
+void send_message(const char msg[]) {
+  size_t sent_data_size = bleuart.write(msg, strlen(msg));
 }
 
 void startAdv(void) {
@@ -166,9 +138,15 @@ void bleuart_rx_callback(uint16_t conn_hdl) {
     rxStartTime = millis();
   }
 
+  VisRing.clearDisplay();
+  VisRing.setCursor(10, 12);
+
   while (bleuart.available()) {
-    Serial.print((char)bleuart.read());
+    char c = (char)bleuart.read();
+    Serial.print(c);
+    VisRing.print(c);
   }
+  VisRing.display();
 }
 
 void bleuart_notify_callback(uint16_t conn_hdl, bool enabled) {
@@ -176,10 +154,6 @@ void bleuart_notify_callback(uint16_t conn_hdl, bool enabled) {
     Serial.println("Send a key and press enter to start test");
   }
 }
-
-//////////////////
-////// main //////
-//////////////////
 
 void setup() {
   Serial.begin(115200);
@@ -191,15 +165,21 @@ void setup() {
 
   Serial.println("Bluefruit52 Throughput Example");
   Serial.println("------------------------------\n");
+
+  VisRing.begin(160, 32);  // Display is 160 wide, 32 high
+  VisRing.displayGS();
+  delay(1000);
+  VisRing.clearDisplayGS();
 }
 
 void loop() {
   if (Bluefruit.connected() && bleuart.notifyEnabled()) {
-    int msg = rand();
-    send_message((String)msg);
+    const char msg[] = "this is a message";
+    send_message(msg);
   }
 
   if (!Bluefruit.connected()) {
     COUNT = 0;
   }
+  delay(1000);
 }
