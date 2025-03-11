@@ -30,7 +30,7 @@ unsigned long currentMillis;            // Used for current time
 unsigned long millisOfLastTap = 0;      // Used to record time of first tap
 const unsigned long delayPeriod = 300;  // Forced delay between first and second tap to ensure separate events
 unsigned long displayStartTime = 0;     // Start time of display
-unsigned long turnOfPeriod = 5000;      // Duration before display turns off
+unsigned long turnOffPeriod = 5000;      // Duration before display turns off
 
 // Tap count
 int count = 0;
@@ -76,7 +76,7 @@ int get_imu_total_acc_int() {
 void turnOffDisplay() {
   currentMillis = millis();
   if (currentMillis > displayStartTime) {
-    if (currentMillis - displayStartTime >= turnOfPeriod) {
+    if (currentMillis - displayStartTime >= turnOffPeriod) {
       enableDisplay = false;
     }
   }
