@@ -4,6 +4,10 @@
 #include <SPI.h>
 #include <movingAvg.h> // https://github.com/JChristensen/movingAvg
 
+// PPG
+#include "MAX30105.h"
+#include "heartRate.h"
+
 // IMU
 #include "ICM_20948.h" // http://librarymanager/All#SparkFun_ICM_20948_IMU
 #define CS_PIN 2
@@ -14,6 +18,17 @@
 class VisRingUtility
 {
 private:
+    // PPG
+    MAX30105 ppg;
+
+    static const byte RATE_SIZE = 4;  // Increase this for more averaging. 4 is good.
+    byte rates[RATE_SIZE];     // Array of heart rates
+    byte rateSpot = 0;
+    long lastBeat = 0;  // Time at which the last beat occurred
+    
+    float beatsPerMinute;
+    int beatAvg;
+
     // IMU
     ICM_20948_SPI imu;
 
@@ -33,6 +48,18 @@ private:
     void startAdv(void);
 
 public:
+    VisRingUtility(int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod);
+
+    // HR
+    float dataPPG[2] = {
+        -1,
+        -1,
+      };
+
+    void setupPPG();
+    void clearDataPPG();
+    void updateDataPPG();
+
     // IMU
     float dataIMU[9] = {
         -1,
@@ -45,14 +72,9 @@ public:
         -1,
         -1,
     };
-
-    // Determines if display should be on
-    bool enableDisplay = true;
-    // Timing variables
+    bool enableDisplay = true; // Determines if display should be on
     unsigned long startMillis;   // Start time of the program
     unsigned long currentMillis; // Used for current time
-
-    VisRingUtility(int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod);
     void setupIMU();
     void updateDataIMU();
     int getIMUTotalAccInt();
