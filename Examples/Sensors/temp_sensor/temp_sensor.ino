@@ -1,53 +1,23 @@
 /*
   VisRing code to read and display temperature values.
 */
-
-// General
-#include <Wire.h>
-#include <InternalFileSystem.h>
-#include <Adafruit_Sensor.h>
-#include <SPI.h>
-
-// temp
-#include <Adafruit_TMP117.h>
-
 // oled
 #include <VisRing.h>
+#include <VisRingUtility.h>
 
 VisRing VisRing(15, 16, 12, 13);
 
-float data = -1;
+// int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod
+VisRingUtility VisRingUtility(600, 10, 1000, 300);
 
-Adafruit_TMP117 tmp117;
-
-void tmp_setup() {
-  // Try to initialize!
-  if (!tmp117.begin()) {
-    Serial.println("Failed to find TMP117 chip");
-    while (1) {
-      delay(10);
-    }
-  }
-  Serial.println("TMP117 Success!");
-  tmp117.setAveragedSampleCount(TMP117_AVERAGE_1X);
-  tmp117.setReadDelay(TMP117_DELAY_0_MS);
-}
-
-void get_tmp_data() {
-  data = -1;
-  sensors_event_t temp;  // create an empty event to be filled
-  tmp117.getEvent(&temp);
-  data = temp.temperature;
-}
-
-void display_tmp() {
-  if (data != -1) {
+void displayTMP() {
+  if (VisRingUtility.dataTemp != -1) {
     VisRing.clearDisplayGS();
 
     VisRing.printStringGS(
       10,
       12,
-      "temp:" + (String)data,
+      "temp:" + (String)VisRingUtility.dataTemp,
       false,
       15,
       0);
@@ -58,7 +28,7 @@ void display_tmp() {
 }
 
 void print_data() {
-  Serial.println("temp: " + (String)data);
+  Serial.println("temp: " + (String)VisRingUtility.dataTemp);
 }
 
 void setup() {
@@ -67,7 +37,7 @@ void setup() {
   Wire.begin();
   SPI.begin();
 
-  tmp_setup();
+  VisRingUtility.setupTMP();
 
   VisRing.begin(160, 32);  // Display is 160 wide, 32 high
   VisRing.displayGS();
@@ -76,7 +46,7 @@ void setup() {
 }
 
 void loop() {
-  get_tmp_data();
-  display_tmp();
+  VisRingUtility.updateDataTMP();
+  displayTMP();
   delay(1000);
 }

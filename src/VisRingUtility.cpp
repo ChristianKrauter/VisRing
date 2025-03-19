@@ -13,25 +13,27 @@ VisRingUtility::VisRingUtility(int avgLength, int avgDetectLength, int turnOffPe
 /////// PPG ///////
 ///////////////////
 
-void VisRingUtility::setupPPG() {
+void VisRingUtility::setupPPG()
+{
   Serial.println("MAX30105 Basic Readings Example");
 
   // Setup to sense up to 18 inches, max LED brightness
-  byte ledBrightness = 0xFF;  // Options: 0=Off to 255=50mA
-  byte sampleAverage = 1;     // Options: 1, 2, 4, 8, 16, 32
-  byte ledMode = 3;           // Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
-  int sampleRate = 1600;      // Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
-  int pulseWidth = 411;       // Options: 69, 118, 215, 411
-  int adcRange = 16384;       // Options: 2048, 4096, 8192, 16384
+  byte ledBrightness = 0xFF; // Options: 0=Off to 255=50mA
+  byte sampleAverage = 1;    // Options: 1, 2, 4, 8, 16, 32
+  byte ledMode = 3;          // Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
+  int sampleRate = 1600;     // Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
+  int pulseWidth = 411;      // Options: 69, 118, 215, 411
+  int adcRange = 16384;      // Options: 2048, 4096, 8192, 16384
 
   // Initialize sensor
-  if (ppg.begin(Wire, I2C_SPEED_FAST, 0x57) == false) {
+  if (ppg.begin(Wire, I2C_SPEED_FAST, 0x57) == false)
+  {
     Serial.println("MAX30105 was not found. Please check wiring/power. ");
     while (1)
       ;
   }
 
-  ppg.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);  // Configure sensor. Use 6.4mA for LED drive
+  ppg.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange); // Configure sensor. Use 6.4mA for LED drive
   ppg.setPulseAmplitudeRed(0x50);
   ppg.setPulseAmplitudeIR(0x50);
   ppg.setPulseAmplitudeGreen(0x96);
@@ -39,19 +41,23 @@ void VisRingUtility::setupPPG() {
   Serial.println("MAX30101 Success!");
 }
 
-void VisRingUtility::clearDataPPG() {
-  for (int i = 0; i < 2; i++) {
+void VisRingUtility::clearDataPPG()
+{
+  for (int i = 0; i < 2; i++)
+  {
     dataPPG[i] = -1;
   }
 }
 
-void VisRingUtility::updateDataPPG() {
+void VisRingUtility::updateDataPPG()
+{
   clearDataPPG();
 
   ppg.check();
   long irValue = ppg.getIR();
 
-  if (checkForBeat(irValue) == true) {
+  if (checkForBeat(irValue) == true)
+  {
     // We sensed a beat!
     Serial.println("IR:" + (String)irValue);
 
@@ -60,9 +66,10 @@ void VisRingUtility::updateDataPPG() {
 
     beatsPerMinute = 60 / (delta / 1000.0);
 
-    if (beatsPerMinute < 255 && beatsPerMinute > 20) {
-      rates[rateSpot++] = (byte)beatsPerMinute;  // Store this reading in the array
-      rateSpot %= RATE_SIZE;                     // Wrap variable
+    if (beatsPerMinute < 255 && beatsPerMinute > 20)
+    {
+      rates[rateSpot++] = (byte)beatsPerMinute; // Store this reading in the array
+      rateSpot %= RATE_SIZE;                    // Wrap variable
 
       // Take average of readings
       beatAvg = 0;
@@ -73,6 +80,34 @@ void VisRingUtility::updateDataPPG() {
     dataPPG[0] = beatsPerMinute;
     dataPPG[1] = beatAvg;
   }
+}
+
+///////////////////
+/////// TMP ///////
+///////////////////
+
+void VisRingUtility::setupTMP()
+{
+  // Try to initialize!
+  if (!tmp117.begin())
+  {
+    Serial.println("Failed to find TMP117 chip");
+    while (1)
+    {
+      delay(10);
+    }
+  }
+  Serial.println("TMP117 Success!");
+  tmp117.setAveragedSampleCount(TMP117_AVERAGE_1X);
+  tmp117.setReadDelay(TMP117_DELAY_0_MS);
+}
+
+void VisRingUtility::updateDataTMP()
+{
+  dataTemp = -1;
+  sensors_event_t temp; // create an empty event to be filled
+  tmp117.getEvent(&temp);
+  dataTemp = temp.temperature;
 }
 
 ///////////////////
@@ -185,12 +220,12 @@ void VisRingUtility::setupIMU()
   Serial.println("ICM20948 Success!");
 }
 
-
 ///////////////////
 //// Bluetooth ////
 ///////////////////
 
-void VisRingUtility::setupBluetooth() {
+void VisRingUtility::setupBluetooth()
+{
   // Setup the BLE LED to be enabled on CONNECT
   // Note: This is actually the default behaviour, but provided
   // here in case you want to control this manually via PIN 19
@@ -202,8 +237,8 @@ void VisRingUtility::setupBluetooth() {
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
 
   Bluefruit.begin();
-  Bluefruit.setTxPower(4);  // Check bluefruit.h for supported values
-  Bluefruit.Periph.setConnInterval(6, 12);  // 7.5 - 15 ms
+  Bluefruit.setTxPower(4);                 // Check bluefruit.h for supported values
+  Bluefruit.Periph.setConnInterval(6, 12); // 7.5 - 15 ms
   Bluefruit.setName("VisRing#1");
   // Configure and Start Device Information Service
   bledis.setManufacturer("Adafruit Industries");
@@ -213,18 +248,19 @@ void VisRingUtility::setupBluetooth() {
   // Configure and Start BLE Uart Service
   bleuart.begin();
 
-
   // Set up and start advertising
   startAdv();
   Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
   Serial.println("Once connected, enter character(s) that you wish to send");
 }
 
-void VisRingUtility::sendBTMessage(const char msg[]) {
+void VisRingUtility::sendBTMessage(const char msg[])
+{
   bleuart.write(msg, strlen(msg));
 }
 
-void VisRingUtility::startAdv(void) {
+void VisRingUtility::startAdv(void)
+{
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
   Bluefruit.Advertising.addTxPower();
 
@@ -245,7 +281,7 @@ void VisRingUtility::startAdv(void) {
      https://developer.apple.com/library/content/qa/qa1931/_index.html
   */
   Bluefruit.Advertising.restartOnDisconnect(true);
-  Bluefruit.Advertising.setInterval(32, 244);  // in unit of 0.625 ms
-  Bluefruit.Advertising.setFastTimeout(30);    // number of seconds in fast mode
-  Bluefruit.Advertising.start(0);              // 0 = Don't stop advertising after n seconds
+  Bluefruit.Advertising.setInterval(32, 244); // in unit of 0.625 ms
+  Bluefruit.Advertising.setFastTimeout(30);   // number of seconds in fast mode
+  Bluefruit.Advertising.start(0);             // 0 = Don't stop advertising after n seconds
 }
