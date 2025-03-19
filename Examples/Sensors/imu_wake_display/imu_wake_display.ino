@@ -7,7 +7,9 @@
 #include <VisRingUtility.h>
 
 VisRing VisRing(15, 16, 12, 13);
-VisRingUtility VisRingUtility(600, 10, 5000, 300);
+
+// int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod
+VisRingUtility VisRingUtility(600, 10, 1000, 300);
 
 // seconds since start to be displayed
 int seconds = 0;

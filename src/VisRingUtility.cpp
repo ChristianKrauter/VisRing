@@ -1,6 +1,6 @@
 #include <VisRingUtility.h>
 
-VisRingUtility::VisRingUtility(int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod) : avgTotalAcc(avgLength)
+VisRingUtility::VisRingUtility(int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod) : avgTotalAcc(avgLength, true)
 {
   // IMU
   delayPeriod = delayPeriod;
@@ -34,7 +34,7 @@ void VisRingUtility::detectTap()
     int avgLong = avgTotalAcc.reading(acc);
     if (currentMillis - millisOfLastTap > delayPeriod)
     {
-      int avgShort = avgTotalAcc.getAvg(10);
+      int avgShort = avgTotalAcc.getAvg(avgDetectLength);
       if (avgShort > avgLong + 5)
       {
         count++;
@@ -92,6 +92,8 @@ void VisRingUtility::clearDataIMU()
 void VisRingUtility::setupIMU()
 {
   // imu.enableDebugging();  // Uncomment this line to enable helpful debug messages on Serial
+
+  avgTotalAcc.begin();
 
   bool initialized = false;
   while (!initialized)
