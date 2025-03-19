@@ -4,9 +4,12 @@
 #include <SPI.h>
 #include <movingAvg.h> // https://github.com/JChristensen/movingAvg
 
-// imu
+// IMU
 #include "ICM_20948.h" // http://librarymanager/All#SparkFun_ICM_20948_IMU
 #define CS_PIN 2
+
+// Bluetooth
+#include <bluefruit.h>
 
 class VisRingUtility
 {
@@ -24,6 +27,10 @@ private:
     int count = 0;                         // Tap count
     void clearDataIMU();
     movingAvg avgTotalAcc;
+
+    // Bluetooth
+    BLEDis bledis;
+    void startAdv(void);
 
 public:
     // IMU
@@ -51,4 +58,13 @@ public:
     int getIMUTotalAccInt();
     void turnOffDisplay();
     void detectTap();
+
+    // Bluetooth
+    BLEUart bleuart;
+    uint32_t rxCount = 0;
+    uint32_t rxStartTime = 0;
+    uint32_t rxLastTime = 0;
+    int COUNT;
+    void setupBluetooth();
+    void sendBTMessage(const char msg[]);
 };

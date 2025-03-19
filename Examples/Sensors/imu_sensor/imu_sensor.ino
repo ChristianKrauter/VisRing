@@ -10,7 +10,9 @@ bool print_gyr = true;
 bool print_mag = true;
 
 VisRing VisRing(15, 16, 12, 13);
-VisRingUtility VisRingUtility;
+
+// int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod
+VisRingUtility VisRingUtility(600, 10, 1000, 300);
 
 void setup() {
   Serial.begin(115200);

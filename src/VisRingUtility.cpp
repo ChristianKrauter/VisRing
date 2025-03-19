@@ -9,7 +9,9 @@ VisRingUtility::VisRingUtility(int avgLength, int avgDetectLength, int turnOffPe
   avgDetectLength = avgDetectLength;
 }
 
-// IMU
+///////////////////
+/////// IMU ///////
+///////////////////
 
 int VisRingUtility::getIMUTotalAccInt()
 {
@@ -115,4 +117,69 @@ void VisRingUtility::setupIMU()
     }
   }
   Serial.println("ICM20948 Success!");
+}
+
+
+///////////////////
+//// Bluetooth ////
+///////////////////
+
+void VisRingUtility::setupBluetooth() {
+  // Setup the BLE LED to be enabled on CONNECT
+  // Note: This is actually the default behaviour, but provided
+  // here in case you want to control this manually via PIN 19
+  Bluefruit.autoConnLed(true);
+
+  // Config the peripheral connection with maximum bandwidth
+  // more SRAM required by SoftDevice
+  // Note: All config***() function must be called before begin()
+  Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
+
+  Bluefruit.begin();
+  Bluefruit.setTxPower(4);  // Check bluefruit.h for supported values
+  Bluefruit.Periph.setConnInterval(6, 12);  // 7.5 - 15 ms
+  Bluefruit.setName("VisRing#1");
+  // Configure and Start Device Information Service
+  bledis.setManufacturer("Adafruit Industries");
+  bledis.setModel("Bluefruit Feather52");
+  bledis.begin();
+
+  // Configure and Start BLE Uart Service
+  bleuart.begin();
+
+
+  // Set up and start advertising
+  startAdv();
+  Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
+  Serial.println("Once connected, enter character(s) that you wish to send");
+}
+
+void VisRingUtility::sendBTMessage(const char msg[]) {
+  bleuart.write(msg, strlen(msg));
+}
+
+void VisRingUtility::startAdv(void) {
+  Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
+  Bluefruit.Advertising.addTxPower();
+
+  // Include bleuart 128-bit uuid
+  Bluefruit.Advertising.addService(bleuart);
+
+  // There is no room for Name in Advertising packet
+  // Use Scan response for Name
+  Bluefruit.ScanResponse.addName();
+
+  /* Start Advertising
+     - Enable auto advertising if disconnected
+     - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
+     - Timeout for fast mode is 30 seconds
+     - Start(timeout) with timeout = 0 will advertise forever (until connected)
+
+     For recommended advertising interval
+     https://developer.apple.com/library/content/qa/qa1931/_index.html
+  */
+  Bluefruit.Advertising.restartOnDisconnect(true);
+  Bluefruit.Advertising.setInterval(32, 244);  // in unit of 0.625 ms
+  Bluefruit.Advertising.setFastTimeout(30);    // number of seconds in fast mode
+  Bluefruit.Advertising.start(0);              // 0 = Don't stop advertising after n seconds
 }

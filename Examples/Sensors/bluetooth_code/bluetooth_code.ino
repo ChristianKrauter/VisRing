@@ -2,92 +2,34 @@
   VisRing Bluetooth code to send and receive data via BLE UART.
 */
 
-// General
-#include <Wire.h>
-#include <Adafruit_LittleFS.h>
-#include <InternalFileSystem.h>
-#include "ArduinoJson.h"
-#include <SPI.h>
-
-// bluetooth
-#include <bluefruit.h>
-
 // oled
 #include <VisRing.h>
+#include <VisRingUtility.h>
 
 VisRing VisRing(15, 16, 12, 13);
 
-int total_num_data = 14;
+// int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod
+VisRingUtility VisRingUtility(600, 10, 1000, 300);
 
-BLEDis bledis;
-BLEUart bleuart;
-uint32_t rxCount = 0;
-uint32_t rxStartTime = 0;
-uint32_t rxLastTime = 0;
-int COUNT;
+void bleuart_rx_callback(uint16_t conn_hdl) {
+  (void)conn_hdl;
 
-void bluetooth_setup() {
-  // Setup the BLE LED to be enabled on CONNECT
-  // Note: This is actually the default behaviour, but provided
-  // here in case you want to control this manually via PIN 19
-  Bluefruit.autoConnLed(true);
+  VisRingUtility.rxLastTime = millis();
 
-  // Config the peripheral connection with maximum bandwidth
-  // more SRAM required by SoftDevice
-  // Note: All config***() function must be called before begin()
-  Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
+  // first packet
+  if (VisRingUtility.rxCount == 0) {
+    VisRingUtility.rxStartTime = millis();
+  }
 
-  Bluefruit.begin();
-  Bluefruit.setTxPower(4);  // Check bluefruit.h for supported values
-  Bluefruit.Periph.setConnectCallback(connect_callback);
-  Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
-  Bluefruit.Periph.setConnInterval(6, 12);  // 7.5 - 15 ms
-  Bluefruit.setName("VisRing#1");
-  // Configure and Start Device Information Service
-  bledis.setManufacturer("Adafruit Industries");
-  bledis.setModel("Bluefruit Feather52");
-  bledis.begin();
+  VisRing.clearDisplay();
+  VisRing.setCursor(10, 12);
 
-  // Configure and Start BLE Uart Service
-  bleuart.begin();
-
-  bleuart.setRxCallback(bleuart_rx_callback);
-  bleuart.setNotifyCallback(bleuart_notify_callback);
-
-  // Set up and start advertising
-  startAdv();
-  Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
-  Serial.println("Once connected, enter character(s) that you wish to send");
-}
-
-void send_message(const char msg[]) {
-  size_t sent_data_size = bleuart.write(msg, strlen(msg));
-}
-
-void startAdv(void) {
-  Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
-  Bluefruit.Advertising.addTxPower();
-
-  // Include bleuart 128-bit uuid
-  Bluefruit.Advertising.addService(bleuart);
-
-  // There is no room for Name in Advertising packet
-  // Use Scan response for Name
-  Bluefruit.ScanResponse.addName();
-
-  /* Start Advertising
-     - Enable auto advertising if disconnected
-     - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
-     - Timeout for fast mode is 30 seconds
-     - Start(timeout) with timeout = 0 will advertise forever (until connected)
-
-     For recommended advertising interval
-     https://developer.apple.com/library/content/qa/qa1931/_index.html
-  */
-  Bluefruit.Advertising.restartOnDisconnect(true);
-  Bluefruit.Advertising.setInterval(32, 244);  // in unit of 0.625 ms
-  Bluefruit.Advertising.setFastTimeout(30);    // number of seconds in fast mode
-  Bluefruit.Advertising.start(0);              // 0 = Don't stop advertising after n seconds
+  while (VisRingUtility.bleuart.available()) {
+    char c = (char)VisRingUtility.bleuart.read();
+    Serial.print(c);
+    VisRing.print(c);
+  }
+  VisRing.display();
 }
 
 void connect_callback(uint16_t conn_handle) {
@@ -122,31 +64,10 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason) {
   (void)conn_handle;
   (void)reason;
   Serial.print("total count:");
-  Serial.println(COUNT);
+  Serial.println(VisRingUtility.COUNT);
   Serial.println();
   Serial.print("Disconnected, reason = 0x");
   Serial.println(reason, HEX);
-}
-
-void bleuart_rx_callback(uint16_t conn_hdl) {
-  (void)conn_hdl;
-
-  rxLastTime = millis();
-
-  // first packet
-  if (rxCount == 0) {
-    rxStartTime = millis();
-  }
-
-  VisRing.clearDisplay();
-  VisRing.setCursor(10, 12);
-
-  while (bleuart.available()) {
-    char c = (char)bleuart.read();
-    Serial.print(c);
-    VisRing.print(c);
-  }
-  VisRing.display();
 }
 
 void bleuart_notify_callback(uint16_t conn_hdl, bool enabled) {
@@ -161,10 +82,13 @@ void setup() {
   Wire.begin();
   SPI.begin();
 
-  bluetooth_setup();
+  VisRingUtility.setupBluetooth();
 
-  Serial.println("Bluefruit52 Throughput Example");
-  Serial.println("------------------------------\n");
+  // Bluetooth callback functions
+  Bluefruit.Periph.setConnectCallback(connect_callback);
+  Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
+  VisRingUtility.bleuart.setNotifyCallback(bleuart_notify_callback);
+  VisRingUtility.bleuart.setRxCallback(bleuart_rx_callback);
 
   VisRing.begin(160, 32);  // Display is 160 wide, 32 high
   VisRing.displayGS();
@@ -173,13 +97,9 @@ void setup() {
 }
 
 void loop() {
-  if (Bluefruit.connected() && bleuart.notifyEnabled()) {
-    const char msg[] = "this is a message";
-    send_message(msg);
+  if (!Bluefruit.connected()) {
+    VisRingUtility.COUNT = 0;
   }
 
-  if (!Bluefruit.connected()) {
-    COUNT = 0;
-  }
   delay(1000);
 }
