@@ -272,20 +272,19 @@ void VisRing::drawBarChartVertSmallMultiples(int values[7][16], int charts_count
 
     int width = (SSD1320::getDisplayHeight() - (values_counts[chart] - 1)) / values_counts[chart];
 
-    int gs = 0;
+    int offset = (SSD1320::getDisplayHeight() - width * values_counts[chart] - (values_counts[chart] - 1)) / 2;
+
+    int gs = grayscale;
     if (focus_charts[chart])
     {
       gs = grayscale_focus;
     }
-    else
-    {
-      gs = grayscale;
-    }
+
+    SSD1320::lineGS(height * chart + 10 * chart, 0, height * chart + 10 * chart, 32, gs);
 
     for (int i = 0; i < values_counts[chart]; i++)
     {
-      SSD1320::lineGS(height * chart + 10 * chart, 0, height * chart + 10 * chart, 32, gs);
-      SSD1320::rectFillGS(height * chart + 10 * chart, i + i * 1 + i * width, values[chart][i], width, gs);
+      SSD1320::rectFillGS(height * chart + 10 * chart, i * 1 + i * width + offset, values[chart][i], width, gs);
     }
   }
 }
