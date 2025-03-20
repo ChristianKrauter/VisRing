@@ -82,7 +82,7 @@ void setup() {
   Wire.begin();
   SPI.begin();
 
-  VisRingUtility.setupBluetooth();
+  VisRingUtility.setupBluetooth("VisRing #1");
 
   // Bluetooth callback functions
   Bluefruit.Periph.setConnectCallback(connect_callback);

@@ -76,9 +76,9 @@ void VisRingUtility::updateDataPPG()
       for (byte x = 0; x < RATE_SIZE; x++)
         beatAvg += rates[x];
       beatAvg /= RATE_SIZE;
+      dataPPG[0] = beatsPerMinute;
+      dataPPG[1] = beatAvg;
     }
-    dataPPG[0] = beatsPerMinute;
-    dataPPG[1] = beatAvg;
   }
 }
 
@@ -224,7 +224,7 @@ void VisRingUtility::setupIMU()
 //// Bluetooth ////
 ///////////////////
 
-void VisRingUtility::setupBluetooth()
+void VisRingUtility::setupBluetooth(const char *ringName)
 {
   // Setup the BLE LED to be enabled on CONNECT
   // Note: This is actually the default behaviour, but provided
@@ -239,7 +239,7 @@ void VisRingUtility::setupBluetooth()
   Bluefruit.begin();
   Bluefruit.setTxPower(4);                 // Check bluefruit.h for supported values
   Bluefruit.Periph.setConnInterval(6, 12); // 7.5 - 15 ms
-  Bluefruit.setName("VisRing#1");
+  Bluefruit.setName(ringName);
   // Configure and Start Device Information Service
   bledis.setManufacturer("Adafruit Industries");
   bledis.setModel("Bluefruit Feather52");

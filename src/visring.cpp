@@ -503,7 +503,6 @@ void VisRing::drawHRZ(int hr, int grayscale, int grayscale_background)
     drawHeart(80, 20, 0, grayscale_background);
   }
   else if (hr <= 157) // Medium: 93-157
-
   {
     drawHeart(80, 20, 1, grayscale_background);
   }

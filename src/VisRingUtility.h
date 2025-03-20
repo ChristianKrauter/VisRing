@@ -98,6 +98,6 @@ public:
     uint32_t rxStartTime = 0;
     uint32_t rxLastTime = 0;
     int COUNT;
-    void setupBluetooth();
+    void setupBluetooth(const char* ringName);
     void sendBTMessage(const char msg[]);
 };
