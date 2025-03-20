@@ -36,7 +36,7 @@ void updateListPPG() {
 
     // If the array is not full, just add the new value
     if (currentIndex < MAX_SENSOR_VALUES) {
-      listPPG[currentIndex] = VisRingUtility.dataPPG[0];
+      listPPG[currentIndex] = (int)VisRingUtility.dataPPG[0];
       currentIndex++;
     } else {
       // Shift all values forward by one position (remove the oldest)
@@ -44,8 +44,9 @@ void updateListPPG() {
         listPPG[i] = listPPG[i + 1];
       }
       // Add the new value at the end of the array
-      listPPG[MAX_SENSOR_VALUES - 1] = VisRingUtility.dataPPG[0];
+      listPPG[MAX_SENSOR_VALUES - 1] = (int)VisRingUtility.dataPPG[0];
     }
+    Serial.println(listPPG[MAX_SENSOR_VALUES - 1]);
   }
 }
 
@@ -104,7 +105,7 @@ void conditionFour() {
       };
       int charts_count_0 = 4;
       int values_counts_0[7] = { 7, 7, 7, 7 };
-      bool focus_charts_0[7] = { true, false, false, false, false, false, false };
+      bool focus_charts_0[7] = { true, true, true, true, true, true, true };
       int value_range_min = 0;
       int value_range_max_0 = 20000;
 
@@ -133,9 +134,9 @@ void conditionFour() {
       };
       int charts_count_1 = 7;
       int values_counts_1[7] = { 16, 16, 16, 16, 16, 16, 16 };
-      bool focus_charts_1[7] = { true, true, false, true, false, false, true };
+      bool focus_charts_1[7] = { true, true, true, true, true, true, true };
       int value_range_min_1 = 0;
-      int value_range_max_1 = 100;
+      int value_range_max_1 = 5000;
 
       VisRing.drawBarChartVertSmallMultiples(values_1, charts_count_1, values_counts_1, focus_charts_1, value_range_min_1, value_range_max_1, 4, 15);
     }
@@ -254,10 +255,8 @@ void setup() {
 
 void loop() {
   if (Bluefruit.connected() && VisRingUtility.bleuart.notifyEnabled()) {
-
     VisRingUtility.updateDataPPG();
     updateListPPG();
-
     switch (condition) {
       case 1:
         conditionOne();
@@ -274,9 +273,10 @@ void loop() {
       default:
         break;
     }
+    VisRingUtility.COUNT += 1;
   }
   if (!Bluefruit.connected()) {
     VisRingUtility.COUNT = 0;
   }
-  delay(500);
+  delay(1);
 }
