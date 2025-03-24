@@ -5,8 +5,8 @@ class VisRing : public SSD1320
 public:
     using SSD1320::SSD1320;
 
-    void scaleToMinMax(int target_min, int target_max, int values[], int values_count);
-    void scaleToMinMaxKnownRange(int target_min, int target_max, int value_range_min, int value_range_max, int values[], int values_count);
+    void scaleToMinMax(int target_min, int target_max, int values[], int scaled_values[], int values_count);
+    void scaleToMinMaxKnownRange(int target_min, int target_max, int value_range_min, int value_range_max, int values[], int scaled_values[], int values_count);
 
     void drawHeart(int x, int y, int fill_mode, int grayscale);
     void drawEnvelope(int x, int y, int grayscale);

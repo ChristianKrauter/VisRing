@@ -5,13 +5,12 @@
 /// @param target_max Upper bound of target range.
 /// @param values Array to be scaled.
 /// @param values_count Number of items in array.
-void VisRing::scaleToMinMax(int target_min, int target_max, int values[], int values_count)
+void VisRing::scaleToMinMax(int target_min, int target_max, int values[], int scaled_values[], int values_count)
 {
   int values_dif = 0;
   int target_dif = target_max - target_min;
   int values_min = values[0];
   int values_max = values[0];
-  int scaled_values[] = {};
 
   for (int i = 1; i < values_count; i++)
   {
@@ -29,7 +28,7 @@ void VisRing::scaleToMinMax(int target_min, int target_max, int values[], int va
 
   for (int i = 0; i < values_count; i++)
   {
-    values[i] = ((target_dif * (values[i] - values_min)) / (values_dif)) + target_min;
+    scaled_values[i] = ((target_dif * (values[i] - values_min)) / (values_dif)) + target_min;
   }
 }
 
@@ -40,15 +39,14 @@ void VisRing::scaleToMinMax(int target_min, int target_max, int values[], int va
 /// @param value_range_max Upper bound of values.
 /// @param values Array to be scaled.
 /// @param values_count Number of items in array.
-void VisRing::scaleToMinMaxKnownRange(int target_min, int target_max, int value_range_min, int value_range_max, int values[], int values_count)
+void VisRing::scaleToMinMaxKnownRange(int target_min, int target_max, int value_range_min, int value_range_max, int values[], int scaled_values[], int values_count)
 {
   int values_dif = value_range_max - value_range_min;
   int target_dif = target_max - target_min;
-  int scaled_values[] = {};
 
   for (int i = 0; i < values_count; i++)
   {
-    values[i] = ((target_dif * (values[i] - value_range_min)) / (values_dif)) + target_min;
+    scaled_values[i] = ((target_dif * (values[i] - value_range_min)) / (values_dif)) + target_min;
   }
 }
 
@@ -211,18 +209,20 @@ void VisRing::drawHeartBeat(int grayscale)
 /// @param grayscale Grayscale value between 0 and 15.
 void VisRing::drawBarChartHor(int values[], int values_count, int grayscale)
 {
+  int scaled_values[values_count];
+
   if (values_count > 80 | values_count < 2)
   {
     return;
   }
 
-  scaleToMinMax(0, SSD1320::getDisplayHeight(), values, values_count);
+  scaleToMinMax(0, SSD1320::getDisplayHeight(), values, scaled_values, values_count);
 
   int width = (SSD1320::getDisplayWidth() - (values_count - 1)) / values_count;
 
   for (int i = 0; i < values_count; i++)
   {
-    SSD1320::rectFillGS(i + i * 1 + i * width, 0, width, values[i], grayscale);
+    SSD1320::rectFillGS(i + i * 1 + i * width, 0, width, scaled_values[i], grayscale);
   }
 }
 
@@ -232,18 +232,20 @@ void VisRing::drawBarChartHor(int values[], int values_count, int grayscale)
 /// @param grayscale Grayscale value between 0 and 15.
 void VisRing::drawBarChartVert(int values[], int values_count, int grayscale)
 {
+  int scaled_values[values_count];
+
   if (values_count > 16 | values_count < 2)
   {
     return;
   }
 
-  scaleToMinMax(0, SSD1320::getDisplayWidth(), values, values_count);
+  scaleToMinMax(0, SSD1320::getDisplayWidth(), values, scaled_values, values_count);
 
   int width = (SSD1320::getDisplayHeight() - (values_count - 1)) / values_count;
 
   for (int i = 0; i < values_count; i++)
   {
-    SSD1320::rectFillGS(0, i + i * 1 + i * width, values[i], width, grayscale);
+    SSD1320::rectFillGS(0, i + i * 1 + i * width, scaled_values[i], width, grayscale);
   }
 }
 
@@ -268,7 +270,9 @@ void VisRing::drawBarChartVertSmallMultiples(int values[7][16], int charts_count
       return;
     }
 
-    scaleToMinMaxKnownRange(0, height, value_range_min, value_range_max, values[chart], values_counts[chart]);
+    int scaled_values[values_counts[chart]];
+
+    scaleToMinMaxKnownRange(0, height, value_range_min, value_range_max, values[chart], scaled_values, values_counts[chart]);
 
     int width = (SSD1320::getDisplayHeight() - (values_counts[chart] - 1)) / values_counts[chart];
 
@@ -284,7 +288,7 @@ void VisRing::drawBarChartVertSmallMultiples(int values[7][16], int charts_count
 
     for (int i = 0; i < values_counts[chart]; i++)
     {
-      SSD1320::rectFillGS(height * chart + 10 * chart, i * 1 + i * width + offset, values[chart][i], width, gs);
+      SSD1320::rectFillGS(height * chart + 10 * chart, i * 1 + i * width + offset, scaled_values[i], width, gs);
     }
   }
 }
@@ -295,6 +299,8 @@ void VisRing::drawBarChartVertSmallMultiples(int values[7][16], int charts_count
 /// @param grayscale Grayscale value between 0 and 15.
 void VisRing::lineChart(int values[], int values_count, bool fixed_scaling, int value_range_min, int value_range_max, int grayscale)
 {
+  int scaled_values[values_count];
+
   if (values_count > 160 | values_count < 2)
   {
     return;
@@ -302,18 +308,18 @@ void VisRing::lineChart(int values[], int values_count, bool fixed_scaling, int 
 
   if (fixed_scaling)
   {
-    scaleToMinMaxKnownRange(0, SSD1320::getDisplayHeight(), value_range_min, value_range_max, values, values_count);
+    scaleToMinMaxKnownRange(0, SSD1320::getDisplayHeight(), value_range_min, value_range_max, values, scaled_values, values_count);
   }
   else
   {
-    scaleToMinMax(0, SSD1320::getDisplayHeight(), values, values_count);
+    scaleToMinMax(0, SSD1320::getDisplayHeight(), values, scaled_values, values_count);
   }
 
   int step_size = SSD1320::getDisplayWidth() / (values_count - 1);
 
   for (int i = 0; i < values_count - 1; i++)
   {
-    SSD1320::lineGS(i * step_size, values[i], (i + 1) * step_size, values[i + 1], grayscale);
+    SSD1320::lineGS(i * step_size, scaled_values[i], (i + 1) * step_size, scaled_values[i + 1], grayscale);
   }
 }
 
