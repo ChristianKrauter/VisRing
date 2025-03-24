@@ -56,11 +56,9 @@ void VisRingUtility::updateDataPPG()
   ppg.check();
   long irValue = ppg.getIR();
 
+  // We sensed a beat!
   if (checkForBeat(irValue) == true)
   {
-    // We sensed a beat!
-    Serial.println("IR:" + (String)irValue);
-
     long delta = millis() - lastBeat;
     lastBeat = millis();
 
