@@ -7,7 +7,6 @@
 #include <VisRingUtility.h>
 
 VisRing VisRing(15, 16, 12, 13);
-
 // int avgLength, int avgDetectLength, int turnOffPeriod, int delayPeriod
 VisRingUtility VisRingUtility(600, 10, 1000, 300);
 
@@ -26,59 +25,33 @@ int durationConFour = 120000;                                 // 2 minutes = 120
 unsigned long progressIntervalConFour = durationConFour / 8;  // 15 seconds for each bar chart
 bool timerStartedConFour = false;
 
-const int MAX_SENSOR_VALUES = 80;  // Size of the list (number of last sensor readings)
+const int MAX_SENSOR_VALUES = 40;  // Size of the list (number of last sensor readings)
 int listPPG[MAX_SENSOR_VALUES];    // Array to hold the last `n` sensor readings
 int currentIndex = 0;              // Keeps track of the number of values added
 
 // This function simulates receiving a new sensor value
 void updateListPPG() {
-  if (VisRingUtility.dataPPG[0] != -1) {
+  if (VisRingUtility.dataPPG[1] != -1) {
 
-    // If the array is not full, just add the new value
-    if (currentIndex < MAX_SENSOR_VALUES) {
-      listPPG[currentIndex] = (int)VisRingUtility.dataPPG[0];
-      currentIndex++;
-    } else {
-      // Shift all values forward by one position (remove the oldest)
-      for (int i = 0; i < MAX_SENSOR_VALUES - 1; i++) {
-        listPPG[i] = listPPG[i + 1];
-      }
-      // Add the new value at the end of the array
-      listPPG[MAX_SENSOR_VALUES - 1] = (int)VisRingUtility.dataPPG[0];
+    for (int i = 0; i < (MAX_SENSOR_VALUES - 1); i++) {
+      listPPG[i] = listPPG[i + 1];
     }
-    Serial.println(listPPG[MAX_SENSOR_VALUES - 1]);
+
+    // Add the new value at the end of the array
+    listPPG[MAX_SENSOR_VALUES - 1] = (int)VisRingUtility.dataPPG[1];
   }
 }
 
 void conditionOne() {
-  VisRing.clearDisplayGS();
-  VisRing.drawHRZ(listPPG[MAX_SENSOR_VALUES - 1], 15, 4);
-  VisRing.displayGS();
+  if (VisRingUtility.dataPPG[1] != -1) {
+    VisRing.clearDisplayGS(2);
+    VisRing.drawHRZ(VisRingUtility.dataPPG[1], 15, 4);
+    VisRing.displayGS();
+  }
 }
 
 void conditionTwo() {
-  VisRing.clearDisplayGS();
-  VisRing.lineChart(listPPG, MAX_SENSOR_VALUES, true, 0, 200, 15);
-  VisRing.displayGS();
-}
-
-void conditionThree() {
-  VisRing.clearDisplayGS();
-
-  if (!timerStartedConThree) {
-    startMillis = millis();
-    timerStartedConThree = true;
-  } else if (millis() - startMillis > durationConThree) {
-    startMillis = millis();
-  }
-
-  int parts = floor((millis() - startMillis) / progressIntervalConThree);
-  VisRing.radialProgressChart(80, 15, 15, parts, false, 1, 15, 12);
-  VisRing.displayGS();
-}
-
-void conditionFour() {
-  VisRing.clearDisplayGS();
+  VisRing.clearDisplayGS(2);
 
   if (!timerStartedConFour) {
     startMillis = millis();
@@ -146,6 +119,28 @@ void conditionFour() {
     }
   }
 
+  VisRing.displayGS();
+}
+
+void conditionThree() {
+  VisRing.clearDisplayGS(2);
+  VisRing.lineGS(0,16,160,16,2);
+  VisRing.lineChart(listPPG, MAX_SENSOR_VALUES, true, 0, 200, 15);
+  VisRing.displayGS();
+}
+
+void conditionFour() {
+  VisRing.clearDisplayGS(2);
+
+  if (!timerStartedConThree) {
+    startMillis = millis();
+    timerStartedConThree = true;
+  } else if (millis() - startMillis > durationConThree) {
+    startMillis = millis();
+  }
+
+  int parts = floor((millis() - startMillis) / progressIntervalConThree);
+  VisRing.radialProgressChart(80, 15, 15, parts, true, 1, 15, 15);
   VisRing.displayGS();
 }
 
@@ -237,7 +232,7 @@ void setup() {
 
   delay(1000);
 
-  VisRingUtility.setupBluetooth("VisRing #1");
+  VisRingUtility.setupBluetooth("VisRing #2");
 
   // Bluetooth callback functions
   Bluefruit.Periph.setConnectCallback(handleMessage);
@@ -248,8 +243,8 @@ void setup() {
 
   VisRing.begin(160, 32);  // Display is 160 wide, 32 high
   VisRing.displayGS();
-  delay(1000);
-  VisRing.clearDisplayGS();
+  delay(3000);
+  VisRing.clearDisplayGS(2);
   Serial.println("started");
 }
 
@@ -257,6 +252,7 @@ void loop() {
   if (Bluefruit.connected() && VisRingUtility.bleuart.notifyEnabled()) {
     VisRingUtility.updateDataPPG();
     updateListPPG();
+
     switch (condition) {
       case 1:
         conditionOne();
@@ -273,10 +269,12 @@ void loop() {
       default:
         break;
     }
+
     VisRingUtility.COUNT += 1;
   }
+
   if (!Bluefruit.connected()) {
     VisRingUtility.COUNT = 0;
   }
-  delay(1);
+  delay(10);
 }
