@@ -25,7 +25,7 @@ int durationConFour = 120000;                                 // 2 minutes = 120
 unsigned long progressIntervalConFour = durationConFour / 8;  // 15 seconds for each bar chart
 bool timerStartedConFour = false;
 
-const int MAX_SENSOR_VALUES = 40;  // Size of the list (number of last sensor readings)
+const int MAX_SENSOR_VALUES = 20;  // Size of the list (number of last sensor readings)
 int listPPG[MAX_SENSOR_VALUES];    // Array to hold the last `n` sensor readings
 int currentIndex = 0;              // Keeps track of the number of values added
 
