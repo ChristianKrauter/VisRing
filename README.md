@@ -1,16 +1,27 @@
 # VisRing
-Development code for VisRing project as part of the publication \<tba\>.
+Development code for VisRing project as part of the publication [VisRing: A Display-Extended Smartring for Nano Visualizations](https://doi.org/10.1145/3746059.3747806).
 
 Based on [SparkFun_SSD1320_OLED_Arduino_Library](https://github.com/sparkfun/SparkFun_SSD1320_OLED_Arduino_Library) and using [movingAvg.h](https://github.com/JChristensen/movingAvg) both published under GPL v3.
 
 This code is published under a GPL v3 license.
 
+# More Information
+- Project page: https://www.cse.psu.edu/~mkg31/projects/visring/
+- Publications
+    - [VisRing: A Display-Extended Smartring for Nano Visualizations](https://doi.org/10.1145/3746059.3747806).
+    - [Demonstration of VisRing: A Display-Extended Smartring for Nano Visualizations](https://doi.org/10.1145/3746058.3758997)
+- Video: https://www.youtube.com/watch?v=FBm_dOg69tY
+
+# Cite as
+Taiting Lu, Christian Krauter, Runze Liu, Mara Schulte, Alexander Achberger, Tanja Blascheck, Michael Sedlmair, and Mahanth Gowda. 2025. VisRing: A Display-Extended Smartring for Nano Visualizations. In Proc. Symposium User Interface Software and Technology (UIST). ACM, Article 111, 1–18. https://doi.org/10.1145/3746059.3747806
+
+
 # Changes to the SSD1320_OLED_Arduino_Library
 Besides loading bitmap images directly, none of the functions in the original library support grayscale but only monochrome drawing, severely limiting the possibilities for visualizations.
 We overcome this limitation to fully use the display's capabilities by introducing a 2,560-byte array and grayscale variations of all functions while keeping the original functionality.
-The library works through a central memory array which is used to store the next frame.
+The library works through a central memory array, which is used to store the next frame.
 The functions add their changes there.
-The size of this array is limited to 640 bytes due to the memory capacity of past MCUs, thus, one bit controls each pixel, resulting in the limitation of available grayscale values.
+The size of this array is limited to 640 bytes due to the memory capacity of past MCUs; thus, one bit controls each pixel, resulting in the limitation of available grayscale values.
 By adding a bigger array with accompanying functions, we improve the color range from 1-bit to 4-bit grayscale, the maximum the bendable OLED display supports.
 
 # Dependencies
