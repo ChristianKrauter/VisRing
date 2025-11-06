@@ -88,6 +88,23 @@ All of these functions use mock-up data.
 - [user_study](./examples/user_study/study_controller/)
     - Code used to run the user study in the paper
     - Switching between the visualizations is possible by sending data via the BLE connection to the ring.
+### VisrRing_Demo
+- [VisRing_Demo](./Examples/VisRing_Demo/VisRing_Demo.ino)
+
+    - A Demo System for VisRing with
+        - Message Delivery
+        - Time Display
+        - Health Monitoring
+    - Communication using nRF Connect App, in TX Char
+        - Message Delivery
+            - send "mode1" to enter this mode
+            - then send message of up to two line to display
+    - Time Display
+        - send "mode2" to enter this mode
+        - send "time" + HHMMSS to sync time
+    - Health Monitoring
+        - send "mode3" to enter this mode
+
 ## src
 - [SSD1320_OLED](./src/SSD1320_OLED.h)
     - OLED code modified to enable grayscale
